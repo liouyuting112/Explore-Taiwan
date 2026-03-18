@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>探索台灣 - 你的專屬導遊</title>
+    <title>探索台灣 Explore Taiwan - 專業導遊任務</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -15,21 +15,21 @@
             --secondary: #0284c7;
             --accent: #f43f5e;
             --bg: #f8fafc;
+            --text-main: #1e293b;
         }
 
         body {
             background-color: var(--bg);
             font-family: 'Outfit', sans-serif;
-            color: #1e293b;
+            color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
         .header-bg {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-bottom-left-radius: 40px;
             border-bottom-right-radius: 40px;
-            height: 220px;
+            height: 240px;
             position: absolute;
             top: 0;
             left: 0;
@@ -39,280 +39,329 @@
 
         .swiper {
             width: 100%;
-            padding-top: 20px;
-            padding-bottom: 40px;
+            padding-top: 10px;
+            padding-bottom: 30px;
         }
 
         .swiper-slide {
-            width: 280px;
-            height: 380px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            width: 290px;
+            height: 420px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
             overflow: hidden;
             position: relative;
         }
 
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+        .nav-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s;
+            border: 1px solid #f1f5f9;
         }
 
-        .icon-box {
-            width: 60px;
-            height: 60px;
+        .nav-card:active {
+            transform: scale(0.95);
+            background: #f8fafc;
+        }
+
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 20px;
-            font-size: 26px;
+            font-size: 24px;
             color: white;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
         }
 
-        .icon-box:active {
-            transform: scale(0.9);
+        .modal-body-content::-webkit-scrollbar {
+            width: 4px;
         }
 
-        .modal-active {
-            overflow: hidden;
+        .modal-body-content::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
         }
 
-        .btn-close {
-            background: #f1f5f9;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+        .check-item {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 16px;
+            transition: 0.2s;
+        }
+
+        .check-item:active {
+            background: #f1f5f9;
         }
     </style>
 </head>
 
-<body class="bg-slate-50">
+<body class="antialiased">
     <div class="header-bg"></div>
-    <div class="relative z-10 px-6 pt-8 flex justify-between items-center text-white">
-        <div>
-            <div id="datetime-display" class="text-[10px] font-bold opacity-80 tracking-widest uppercase">Taipei, 00:00
-            </div>
-            <h1 class="text-3xl font-extrabold tracking-tight">探索台灣</h1>
+
+    <!-- Top HUD -->
+    <div class="relative z-10 px-6 pt-10 flex justify-between items-center text-white">
+        <div class="animate-in fade-in slide-in-from-top-4 duration-700">
+            <div id="clock-display" class="text-[11px] font-bold opacity-70 tracking-[0.2em]">00:00 TAIPEI</div>
+            <h1 class="text-3xl font-extrabold tracking-tight mt-1">探索台灣</h1>
         </div>
-        <div id="weather-status"
-            class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 text-xs font-bold border border-white/20">
-            <i class="ph ph-sun text-lg"></i>
-            <span>26°C 晴朗</span>
+        <div class="bg-white/20 backdrop-blur-xl px-4 py-2 rounded-2xl border border-white/20 flex items-center gap-2">
+            <i class="ph-bold ph-cloud-sun text-yellow-300"></i>
+            <span class="text-xs font-black">27°C</span>
         </div>
     </div>
 
+    <!-- Hero Carousel -->
     <div class="relative z-10 mt-6 px-4">
         <div class="swiper main-swiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide" onclick="openAttraction('taipei101')">
+                <div class="swiper-slide cursor-pointer" onclick="openHero('taipei101')">
                     <img src="taipei101.png" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="absolute bottom-6 left-6 right-6 text-white">
-                        <span class="bg-rose-500 text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">Must
-                            Visit</span>
-                        <h3 class="text-xl font-extrabold mt-2">台北 101</h3>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-8 left-6 right-6 text-white">
+                        <span
+                            class="bg-rose-500 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Iconic
+                            Landmark</span>
+                        <h3 class="text-2xl font-black mt-2 leading-tight">台北 101<br><span
+                                class="text-xs font-normal opacity-70">TAIPEI 101</span></h3>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="openAttraction('taroko')">
+                <div class="swiper-slide cursor-pointer" onclick="openHero('taroko')">
                     <img src="taroko.png" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="absolute bottom-6 left-6 right-6 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-8 left-6 right-6 text-white">
                         <span
-                            class="bg-emerald-500 text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">Nature</span>
-                        <h3 class="text-xl font-extrabold mt-2">太魯閣國家公園</h3>
+                            class="bg-emerald-500 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Nature
+                            Wonder</span>
+                        <h3 class="text-2xl font-black mt-2 leading-tight">太魯閣峽谷<br><span
+                                class="text-xs font-normal opacity-70">TAROKO GORGE</span></h3>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="openAttraction('jiufen')">
+                <div class="swiper-slide cursor-pointer" onclick="openHero('jiufen')">
                     <img src="jiufen.png" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="absolute bottom-6 left-6 right-6 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-8 left-6 right-6 text-white">
                         <span
-                            class="bg-amber-500 text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">Culture</span>
-                        <h3 class="text-xl font-extrabold mt-2">九份金山老街</h3>
+                            class="bg-amber-500 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Cultural
+                            Heritage</span>
+                        <h3 class="text-2xl font-black mt-2 leading-tight">九份老街<br><span
+                                class="text-xs font-normal opacity-70">JIUFEN OLD STREET</span></h3>
                     </div>
                 </div>
             </div>
-            <div class="swiper-pagination"></div>
+            <div class="swiper-pagination mt-4"></div>
         </div>
+    </div>
 
-        <div class="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 p-8 -mt-6 relative z-20 mb-32">
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-xl font-extrabold text-slate-800">深度探索</h2>
+    <!-- Service Grid -->
+    <div class="bg-white rounded-[44px] shadow-2xl shadow-emerald-900/10 px-6 py-10 -mt-10 relative z-20 pb-24">
+        <h2 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-emerald-500 rounded-full"></span> 規劃你的台灣旅行
+        </h2>
+
+        <div class="grid grid-cols-3 gap-4">
+            <div class="nav-card" onclick="openService('airport')">
+                <div class="icon-circle bg-sky-500 shadow-lg shadow-sky-200"><i class="ph-bold ph-airplane-landing"></i>
+                </div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">機場交通</span>
             </div>
-            <div class="nav-grid">
-                <div class="nav-item" onclick="openModal('airportModal')">
-                    <div class="icon-box bg-blue-500"><i class="ph ph-airplane"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">機場交通</p>
+            <div class="nav-card" onclick="openService('mrt')">
+                <div class="icon-circle bg-emerald-500 shadow-lg shadow-emerald-200"><i class="ph-bold ph-train"></i>
                 </div>
-                <div class="nav-item" onclick="openModal('mrtModal')">
-                    <div class="icon-box bg-emerald-500"><i class="ph ph-train"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">捷運指南</p>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">捷運智能</span>
+            </div>
+            <div class="nav-card" onclick="openService('rail')">
+                <div class="icon-circle bg-indigo-500 shadow-lg shadow-indigo-200"><i class="ph-bold ph-path"></i></div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">高鐵台鐵</span>
+            </div>
+            <div class="nav-card" onclick="location.href='food.html'">
+                <div class="icon-circle bg-rose-500 shadow-lg shadow-rose-200"><i class="ph-bold ph-hamburger"></i>
                 </div>
-                <div class="nav-item" onclick="openModal('intercityModal')">
-                    <div class="icon-box bg-indigo-500"><i class="ph ph-path"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">高鐵台鐵</p>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">美食地圖</span>
+            </div>
+            <div class="nav-card" onclick="openService('itin')">
+                <div class="icon-circle bg-amber-500 shadow-lg shadow-amber-200"><i
+                        class="ph-bold ph-calendar-plus"></i></div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">推薦行程</span>
+            </div>
+            <div class="nav-card" onclick="openService('checklist')">
+                <div class="icon-circle bg-slate-800 shadow-lg shadow-slate-300"><i class="ph-bold ph-check-square"></i>
                 </div>
-                <div class="nav-item" onclick="window.location.href='food.html'">
-                    <div class="icon-box bg-rose-500"><i class="ph ph-hamburger"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">在地美食</p>
-                </div>
-                <div class="nav-item" onclick="openModal('itinModal')">
-                    <div class="icon-box bg-amber-500"><i class="ph ph-calendar"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">完美行程</p>
-                </div>
-                <div class="nav-item" onclick="openModal('checkModal')">
-                    <div class="icon-box bg-slate-800"><i class="ph ph-check-square"></i></div>
-                    <p class="text-[11px] font-extrabold text-slate-600 mt-2">旅行必備</p>
-                </div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">旅行必備</span>
             </div>
         </div>
     </div>
 
-    <!-- Modals Layer -->
-    <div id="modalOverlay"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-end justify-center">
-        <div id="modalContent"
-            class="bg-white w-full max-w-lg rounded-t-[40px] p-8 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom duration-300 relative">
+    <!-- Advanced Modal -->
+    <div id="modal-overlay"
+        class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-end justify-center transition-all duration-300">
+        <div id="modal-content"
+            class="bg-white w-full max-w-lg rounded-t-[48px] p-8 h-[85vh] flex flex-col relative transform translate-y-full transition-transform duration-500">
             <button onclick="closeModal()"
-                class="fixed top-auto right-auto ml-[320px] -mt-4 btn-close z-[110] shadow-lg"><i
-                    class="ph ph-x text-lg"></i></button>
-            <div id="modalDynamicBody" class="pb-10"></div>
+                class="absolute top-6 right-8 bg-slate-100 p-3 rounded-full hover:bg-slate-200 transition">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div id="modal-dynamic-content" class="flex-1 overflow-y-auto pr-2 mt-4 modal-body-content"></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const MRT_DATA = [
-            { line: "🔵 板南線", stations: ["台北車站", "西門", "忠孝復興", "市政府", "南港展覽館"] },
-            { line: "🔴 淡水信義線", stations: ["台北車站", "台北101", "中山", "士林", "北投", "淡水"] },
-            { line: "🟢 松山新店線", stations: ["西門", "北門", "南京復興", "松山"] }
+        // Data Structures
+        const MRT_LINES = [
+            { name: "🟦 板南線 (Blue)", stations: ["捷運台北車站", "捷運西門站", "捷運忠孝復興站", "捷運市政府站", "捷運南港展覽館站"] },
+            { name: "🟥 淡水信義線 (Red)", stations: ["捷運台北車站", "捷運台北101站", "捷運中山站", "捷運士林站", "捷運北投站", "捷運淡水站"] },
+            { name: "🟩 松山新店線 (Green)", stations: ["捷運西門站", "捷運北門站", "捷運松江南京站", "捷運松山站"] }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
             new Swiper(".main-swiper", {
-                effect: "coverflow",
-                centeredSlides: true,
-                slidesPerView: "auto",
-                coverflowEffect: { rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: true },
+                effect: "coverflow", centeredSlides: true, slidesPerView: "auto",
+                coverflowEffect: { rotate: 5, stretch: 0, depth: 100, modifier: 1, slideShadows: false },
                 pagination: { el: ".swiper-pagination", clickable: true }
             });
-            updateClock();
-            setInterval(updateClock, 1000);
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock-display').textContent = now.toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }) + ' TAIPEI';
+            }, 1000);
         });
 
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
-            document.getElementById('datetime-display').textContent = `Taipei, ${timeStr}`;
-        }
-
-        const modalTemplates = {
-            airportModal: `
-                <h3 class="text-2xl font-black text-slate-800 mb-6">✈️ 機場交通攻略</h3>
-                <div class="space-y-4">
-                    <div class="p-5 bg-blue-50 rounded-3xl border border-blue-100">
-                        <p class="text-blue-600 font-extrabold text-sm mb-1 uppercase tracking-wider">桃園機場 (TPE)</p>
-                        <p class="text-slate-700 text-sm leading-relaxed">搭乘「機場捷運」直達台北車站，約 35 分鐘。票價 160 元。</p>
+        const TEMPLATES = {
+            airport: `
+                <div class="text-xs font-black text-emerald-600 uppercase mb-2">Transport</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-6 tracking-tight">機場交通攻略</h3>
+                <div class="space-y-6">
+                    <div class="p-6 bg-blue-50 border border-blue-100 rounded-[32px]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="ph-fill ph-airplane-in-flight text-2xl text-blue-500"></i>
+                            <span class="font-black text-blue-800">桃園機場 (TPE)</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed font-medium">1. **機場捷運**：直達車約35分抵達台北車站 (160元)。<br>2. **客運1819**：24小時營運，直達台北車站。</p>
                     </div>
-                    <div class="p-5 bg-orange-50 rounded-3xl border border-orange-100">
-                        <p class="text-orange-600 font-extrabold text-sm mb-1 uppercase tracking-wider">松山機場 (TSA)</p>
-                        <p class="text-slate-700 text-sm leading-relaxed">位於台北市區，搭乘捷運文湖線 (棕線) 即可快速抵達。</p>
+                    <div class="p-6 bg-orange-50 border border-orange-100 rounded-[32px]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="ph-fill ph-buildings text-2xl text-orange-500"></i>
+                            <span class="font-black text-orange-800">松山機場 (TSA)</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed font-medium">位於市中心。直接搭乘 **捷運文湖線** (棕線) 抵達市區僅需10-15分鐘。</p>
                     </div>
                 </div>
             `,
-            mrtModal: `
-                <h3 class="text-2xl font-black text-slate-800 mb-6">🚆 捷運智能規劃</h3>
-                <div class="space-y-4">
+            mrt: `
+                <div class="text-xs font-black text-emerald-600 uppercase mb-2">Smart Route</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-6 tracking-tight">捷運智能規劃</h3>
+                <div class="space-y-5">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 ml-2">起點站</label>
-                        <select id="mrt-start" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-emerald-500">
-                             ${MRT_DATA.map(l => `<optgroup label="${l.line}">${l.stations.map(s => `<option>${s}</option>`)}</optgroup>`).join('')}
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">起點站 Starting</label>
+                        <select id="start-st" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-emerald-500">
+                             ${MRT_LINES.map(l => `<optgroup label="${l.name}">${l.stations.map(s => `<option>${s}</option>`)}</optgroup>`).join('')}
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-400 ml-2">終點站</label>
-                        <select id="mrt-end" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-emerald-500">
-                             ${MRT_DATA.map(l => `<optgroup label="${l.line}">${l.stations.map(s => `<option>${s}</option>`)}</optgroup>`).join('')}
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">終點站 Destination</label>
+                        <select id="end-st" class="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-emerald-500">
+                             ${MRT_LINES.map(l => `<optgroup label="${l.name}">${l.stations.map(s => `<option>${s}</option>`)}</optgroup>`).join('')}
                         </select>
                     </div>
-                    <button class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black shadow-lg shadow-emerald-200" onclick="calcMrt()">規劃路徑</button>
-                    <div id="mrt-result" class="hidden animate-in fade-in zoom-in p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                        <p class="text-xs font-bold text-slate-400 mb-1">預估時間</p>
-                        <p class="text-2xl font-black text-emerald-600" id="mrt-time">-- 分鐘</p>
+                    <button onclick="calculateMrt()" class="w-full py-5 bg-emerald-600 text-white rounded-[24px] font-black shadow-xl shadow-emerald-200 active:scale-95 transition">開始計算路線</button>
+                    <div id="mrt-res" class="hidden animate-in zoom-in-95 p-8 bg-emerald-50 border border-emerald-100 rounded-[32px] text-center">
+                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">預估時間 Estimate</p>
+                        <div class="text-4xl font-black text-emerald-800" id="mrt-time">-- 分鐘</div>
+                        <p class="text-xs font-bold text-emerald-600 mt-3">※台北捷運在轉乘站點提供了優越的指示。</p>
                     </div>
                 </div>
             `,
-            intercityModal: `
-                <h3 class="text-2xl font-black text-slate-800 mb-6">🌍 高鐵/台鐵</h3>
-                <div class="space-y-3">
-                    <a href="https://www.thsrc.com.tw/" target="_blank" class="flex items-center justify-between p-5 bg-indigo-50 rounded-2xl border border-indigo-100">
-                        <span class="font-bold text-indigo-700">台灣高鐵 (HSR)</span>
-                        <i class="ph ph-arrow-square-out"></i>
+            rail: `
+                <div class="text-xs font-black text-indigo-600 uppercase mb-2">Intercity</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-6 tracking-tight">城際交通指引</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <a href="https://www.thsrc.com.tw/" target="_blank" class="flex items-center justify-between p-6 bg-indigo-50 border border-indigo-100 rounded-[32px] hover:bg-indigo-100 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm"><i class="ph-bold ph-lightning"></i></div>
+                            <div>
+                                <p class="font-black text-indigo-900">台灣高鐵 (HSR)</p>
+                                <p class="text-[10px] text-indigo-500 font-bold">南北長途最速選擇</p>
+                            </div>
+                        </div>
+                        <i class="ph ph-arrow-square-out text-indigo-400"></i>
                     </a>
-                    <a href="https://tip.railway.gov.tw/" target="_blank" class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                        <span class="font-bold text-slate-700">台灣鐵路 (TRA)</span>
-                        <i class="ph ph-arrow-square-out"></i>
+                    <a href="https://tip.railway.gov.tw/" target="_blank" class="flex items-center justify-between p-6 bg-slate-50 border border-slate-200 rounded-[32px] hover:bg-slate-100 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm"><i class="ph-bold ph-train-simple"></i></div>
+                            <div>
+                                <p class="font-black text-slate-800">台灣鐵路 (TRA)</p>
+                                <p class="text-[10px] text-slate-400 font-bold">環島與支線慢旅首選</p>
+                            </div>
+                        </div>
+                        <i class="ph ph-arrow-square-out text-slate-300"></i>
                     </a>
                 </div>
             `,
-            checkModal: `
-                <h3 class="text-2xl font-black text-slate-800 mb-6">📝 旅行必備</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                        <i class="ph ph-check-circle text-emerald-500 text-xl"></i>
-                        <span class="font-bold text-slate-700">悠遊卡 / 一卡通 (EasyCard)</span>
-                    </div>
-                    <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                        <i class="ph ph-check-circle text-emerald-500 text-xl"></i>
-                        <span class="font-bold text-slate-700">中華電信 / 遠傳 5G SIM卡</span>
-                    </div>
+            checklist: `
+                <div class="text-xs font-black text-slate-400 uppercase mb-2">Checklist</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-6 tracking-tight">旅行家必備清單</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="check-item"><i class="ph-fill ph-check-circle text-emerald-500"></i><span class="text-sm font-bold text-slate-700">悠遊卡 / 一卡通 (超商及捷運必備)</span></div>
+                    <div class="check-item"><i class="ph-fill ph-check-circle text-emerald-500"></i><span class="text-sm font-bold text-slate-700">台灣 5G SIM卡 (機場櫃檯辦理)</span></div>
+                    <div class="check-item"><i class="ph-fill ph-check-circle text-emerald-500"></i><span class="text-sm font-bold text-slate-700">行動電源 (地圖導航極其耗電)</span></div>
+                    <div class="check-item"><i class="ph-fill ph-check-circle text-emerald-500"></i><span class="text-sm font-bold text-slate-700">GoTrip / FunNow 手機 APP</span></div>
+                    <div class="check-item"><i class="ph-fill ph-check-circle text-emerald-500"></i><span class="text-sm font-bold text-slate-700">輕便雨具 (台北午後易雷雨)</span></div>
                 </div>
             `,
-            itinModal: `
-                <h3 class="text-2xl font-black text-slate-800 mb-6">🎯 三天二夜完美行程</h3>
-                <div class="space-y-4">
-                    <div class="border-l-4 border-emerald-500 pl-4">
-                        <p class="text-[10px] font-bold text-emerald-600">Day 1 - 城市探索</p>
-                        <p class="text-sm font-bold text-slate-800">台北101 → 象山夕陽 → 臨江街夜市</p>
+            itin: `
+                <div class="text-xs font-black text-amber-600 uppercase mb-2">Recommended Itinerary</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-6 tracking-tight">三天二夜精選推薦</h3>
+                <div class="space-y-6">
+                    <div class="relative pl-6 border-l-4 border-amber-500">
+                        <p class="font-black text-amber-600 mb-1 tracking-widest text-[10px]">DAY 01 - TAIPEI CITY</p>
+                        <p class="text-sm font-bold text-slate-700">台北101 → 象山親山步道夕陽 → 臨江街夜市 (通化街)</p>
                     </div>
-                    <div class="border-l-4 border-blue-500 pl-4">
-                        <p class="text-[10px] font-bold text-blue-600">Day 2 - 懷舊之情</p>
-                        <p class="text-sm font-bold text-slate-800">九份老街 → 十分放天燈 → 基隆廟口</p>
+                    <div class="relative pl-6 border-l-4 border-sky-500">
+                        <p class="font-black text-sky-600 mb-1 tracking-widest text-[10px]">DAY 02 - NOSTALGIC TAIWAN</p>
+                        <p class="text-sm font-bold text-slate-700">九份老街 (阿妹茶樓) → 十分大瀑布 (放天燈) → 基隆廟口夜市</p>
+                    </div>
+                    <div class="relative pl-6 border-l-4 border-rose-500">
+                        <p class="font-black text-rose-600 mb-1 tracking-widest text-[10px]">DAY 03 - CULTURE & FOOD</p>
+                        <p class="text-sm font-bold text-slate-700">中正紀念堂 (衛兵交接) → 永康街牛肉麵 → 西門町商圈</p>
                     </div>
                 </div>
             `
         };
 
-        function openModal(id) {
-            const overlay = document.getElementById('modalOverlay');
-            document.getElementById('modalDynamicBody').innerHTML = modalTemplates[id] || `<div class='p-10 text-center text-slate-400'>開發中...</div>`;
-            overlay.classList.remove('hidden');
+        function openService(id) {
+            const over = document.getElementById('modal-overlay');
+            const box = document.getElementById('modal-content');
+            document.getElementById('modal-dynamic-content').innerHTML = TEMPLATES[id] || "Coming Soon...";
+            over.classList.remove('hidden');
+            setTimeout(() => { box.classList.remove('translate-y-full'); }, 50);
             document.body.classList.add('modal-active');
         }
 
         function closeModal() {
-            document.getElementById('modalOverlay').classList.add('hidden');
-            document.body.classList.remove('modal-active');
+            const over = document.getElementById('modal-overlay');
+            const box = document.getElementById('modal-content');
+            box.classList.add('translate-y-full');
+            setTimeout(() => { over.classList.add('hidden'); document.body.classList.remove('modal-active'); }, 300);
         }
 
-        function calcMrt() {
-            document.getElementById('mrt-result').classList.remove('hidden');
+        function calculateMrt() {
+            document.getElementById('mrt-res').classList.remove('hidden');
             document.getElementById('mrt-time').textContent = (Math.floor(Math.random() * 20) + 15) + ' 分鐘';
         }
 
-        function openAttraction(key) { showToast(`正在規劃 ${key} 路線...`); }
-
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = "fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl animate-in slide-in-from-bottom-5";
-            t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(() => { t.remove(); }, 2500);
+        function openHero(key) {
+            const titles = { taipei101: "台北 101", taroko: "太魯閣國家公園", jiufen: "九份老街" };
+            alert(`正在為您打開 ${titles[key]} 的詳細導覽指南...`);
         }
     </script>
 </body>
