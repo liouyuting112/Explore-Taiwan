@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣美食導航 Busan Food Pass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f8ff; /* 淺藍色背景 */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom map button color for Busan (Ocean Blue vibe) */
+        .btn-nav {
+            background-color: #2563eb; /* 藍色系 */
+        }
+        .btn-nav:hover {
+            background-color: #1d4ed8;
+        }
+        /* Naver Map Brand Color */
+        .btn-google {
+            background-color: #03C75A; /* Naver 綠色 */
+        }
+        .btn-google:hover {
+            background-color: #02b351;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Busan Pass 台灣美食地圖
+            </h1>
+            <!-- 回到首頁連結 -->
+            <a href="https://linkuei0425.github.io/Busan/index.html" class="flex items-center gap-1 text-sm md:text-base font-medium bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                回到首頁
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 max-w-5xl">
+        <!-- Region Selector -->
+        <section class="mb-6">
+            <h2 class="text-sm font-bold text-gray-500 mb-3 uppercase tracking-wider">選擇區域 (Select Region)</h2>
+            <div id="region-buttons" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+                <!-- Region buttons injected by JS -->
+            </div>
+        </section>
+
+        <!-- Category Selector -->
+        <section class="mb-8 hidden" id="category-section">
+            <h2 class="text-sm font-bold text-gray-500 mb-3 uppercase tracking-wider">選擇類別 (Select Category)</h2>
+            <div id="category-buttons" class="flex flex-wrap gap-2">
+                <!-- Category buttons injected by JS -->
+            </div>
+        </section>
+
+        <!-- Content Area -->
+        <section id="content-area" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            <!-- Cards injected by JS -->
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <p class="text-lg">請先從上方選擇您想探索的台灣區域與類別</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+const TAIWAN_FOOD_DB = {
+    "taipei": {
+        name: "台北 / 新北",
+        categories: {
+            "xiao_long_bao": [
+                { name: "鼎泰豐 (信義店)", feature: "世界知名的黃金18摺小籠包，服務極佳，皮薄多汁，必點絲瓜蝦仁小籠包。", address: "台北市大安區信義路二段194號 / 東門站步行1分鐘" },
+                { name: "杭州小籠湯包", feature: "平民版的鼎泰豐，位於中正紀念堂旁，湯包現點現做，CP值非常高。", address: "台北市大安區杭州南路二段19號 / 中正紀念堂站步行5分鐘" },
+                { name: "點水樓", feature: "獲得米其林推薦，小籠包口感細緻，除了原味還有黑蒜頭等多種創意口味。", address: "台北市大安區忠孝東路三段300號 / 忠孝復興站內" }
+            ],
+            "beef_noodles": [
+                { name: "林東芳牛肉麵", feature: "台北老字號，特製牛油是靈魂，湯頭濃郁，牛肉燉得非常入味。", address: "台北市中山區安東街4-3號 / 南京復興站步行8分鐘" },
+                { name: "劉山東牛肉麵", feature: "隱身在台北車站巷弄，必比登推薦，湯頭清甜，麵條紮實有勁。", address: "台北市中正區開封街一段14巷2號 / 台北車站步行5分鐘" },
+                { name: "牛店牛肉麵", feature: "精緻奢華感牛肉麵，湯頭有川味與紅燒可選，肉質極為軟嫩。", address: "台北市萬華區昆明街91號 / 西門站步行5分鐘" }
+            ]
+        }
+    },
+    "tainan": {
+        name: "台南 / 美食之都",
+        categories: {
+            "beef_soup": [
+                { name: "文章牛肉湯", feature: "台南必吃清晨美食，溫體牛現點現沖，湯頭鮮甜無比。", address: "台南市安平區安平路590號 / 近安平老街" },
+                { name: "阿村第二代牛肉湯", feature: "位於國華街上的老店，湯頭層次豐富，肉片Q彈。", address: "台南市中西區國華街三段128號 / 近神農街" }
+            ]
+        }
+    }
+};
+
+window.TAIWAN_FOOD_DB = TAIWAN_FOOD_DB;
+
+
+        // Busan Data Structure (3 items per category strictly)
+        const db = window.TAIWAN_FOOD_DB;;
+
+        // Custom Categories adapted for Busan
+        const categoriesMap = {
+            "pork_soup": { name: "🍲 豬肉湯飯", color: "bg-amber-100 text-amber-800 hover:bg-amber-600 hover:text-white border-amber-400" },
+            "seafood": { name: "🦀 海鮮與烤貝", color: "bg-sky-100 text-sky-800 hover:bg-sky-600 hover:text-white border-sky-400" },
+            "bbq": { name: "🥩 韓式烤肉", color: "bg-red-100 text-red-800 hover:bg-red-600 hover:text-white border-red-400" },
+            "cafe": { name: "☕ 絕美咖啡廳", color: "bg-teal-100 text-teal-800 hover:bg-teal-600 hover:text-white border-teal-400" },
+            "street_food": { name: "🍢 傳統小吃與夜市", color: "bg-orange-100 text-orange-800 hover:bg-orange-600 hover:text-white border-orange-400" }
+        };
+
+        let currentRegion = "";
+        let currentCategory = "";
+
+        // Elements
+        const regionContainer = document.getElementById('region-buttons');
+        const categoryContainer = document.getElementById('category-buttons');
+        const categorySection = document.getElementById('category-section');
+        const contentArea = document.getElementById('content-area');
+
+        // Render Regions
+        function initRegions() {
+            Object.keys(db).forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = "whitespace-nowrap px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors shadow-sm";
+                btn.innerText = db[key].name;
+                btn.onclick = () => selectRegion(key, btn);
+                regionContainer.appendChild(btn);
+            });
+        }
+
+        // Render Categories
+        function initCategories() {
+            Object.keys(categoriesMap).forEach(key => {
+                const config = categoriesMap[key];
+                const btn = document.createElement('button');
+                btn.className = `whitespace-nowrap px-4 py-2 rounded-full border transition-all font-medium ${config.color}`;
+                btn.innerText = config.name;
+                btn.onclick = () => selectCategory(key, btn);
+                categoryContainer.appendChild(btn);
+            });
+        }
+
+        function selectRegion(regionKey, clickedBtn) {
+            currentRegion = regionKey;
+            
+            // Highlight active region
+            Array.from(regionContainer.children).forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            clickedBtn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-blue-600');
+            clickedBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+
+            // Show category section
+            categorySection.classList.remove('hidden');
+            categorySection.classList.add('fade-in');
+            
+            // Auto select first category if none selected
+            if(!currentCategory) {
+                const firstCatBtn = categoryContainer.children[0];
+                selectCategory('pork_soup', firstCatBtn);
+            } else {
+                renderContent();
+            }
+        }
+
+        function selectCategory(catKey, clickedBtn) {
+            currentCategory = catKey;
+
+            // Highlight active category
+            Array.from(categoryContainer.children).forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500', 'shadow-md', 'scale-105');
+                btn.style.opacity = "0.6";
+            });
+            clickedBtn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500', 'shadow-md', 'scale-105');
+            clickedBtn.style.opacity = "1";
+
+            renderContent();
+        }
+
+        function renderContent() {
+            contentArea.innerHTML = '';
+            const items = db[currentRegion].categories[currentCategory];
+
+            if(!items || items.length === 0) {
+                contentArea.innerHTML = `<p class="col-span-full text-center py-8 text-gray-500">此分類目前無資料</p>`;
+                return;
+            }
+
+            items.forEach((item, index) => {
+                // 1. 產生 Google Maps 導航網址
+                const encodedGoogleQuery = encodeURIComponent(`${item.name} Busan ${item.address.split('/')[0]}`);
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedGoogleQuery}`;
+
+                // 2. 產生 Naver Map 導航網址
+                // 為了提高 Naver Map 搜尋精準度，自動過濾並提取出「純韓文地址」（通常在左括號前）
+                const pureKoreanAddress = item.address.split('(')[0].trim();
+                const encodedNaverQuery = encodeURIComponent(pureKoreanAddress);
+                const googleMapsUrl = `https://map.google.com/p/search/${encodedNaverQuery}`;
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col fade-in hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1";
+                card.style.animationDelay = `${index * 0.08}s`;
+
+                card.innerHTML = `
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-gray-800 leading-tight">${item.name}</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-5 leading-relaxed tracking-wide"><span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded mr-1">特色</span>${item.feature}</p>
+                        
+                        <div class="bg-gray-50/80 p-3.5 rounded-xl flex items-start gap-3 border border-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <p class="text-sm text-gray-600 leading-tight font-medium"><span class="font-bold text-blue-800">地址：</span>${item.address}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="px-6 pb-6 mt-auto flex flex-col gap-2.5">
+                        <!-- Naver Map 按鈕 -->
+                        <a href="${googleMapsUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 btn-google text-white py-2.5 rounded-xl transition-colors shadow-sm hover:shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                            <div class="flex flex-col items-start justify-center">
+                                <span class="font-bold text-[15px] leading-tight">Google Maps 導航</span>
+                                <span class="text-[11px] font-normal opacity-90 leading-tight mt-0.5">本地導航首選</span>
+                            </div>
+                        </a>
+                        
+                        <!-- Google Maps 按鈕 -->
+                        <a href="${googleMapsUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 btn-nav text-white py-2.5 rounded-xl transition-colors shadow-sm hover:shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="font-bold text-[15px]">開啟 Google Maps 導航</span>
+                        </a>
+                    </div>
+                `;
+                contentArea.appendChild(card);
+            });
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initRegions();
+            initCategories();
+        });
+
+    </script>
+</body>
+</html>

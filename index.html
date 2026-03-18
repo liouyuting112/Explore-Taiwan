@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>探索台灣 - 你的專屬導遊</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --accent: #ff4757;
+        }
+        body { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+            font-family: 'Outfit', sans-serif; 
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .header-gradient {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 41, 59, 0) 100%);
+        }
+        .swiper {
+            width: 100%;
+            padding-top: 20px;
+            padding-bottom: 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 300px;
+            height: 400px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        .slide-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+        .btn-primary {
+            background: var(--accent);
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+        }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="fixed top-0 left-0 right-0 z-50 px-6 pt-6 flex justify-between items-center header-gradient">
+        <div>
+            <p id="datetime-display" class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Taipei, 00:00</p>
+            <h1 class="text-3xl font-extrabold tracking-tight">探索台灣</h1>
+        </div>
+        <div id="weather-status" class="glass-card px-4 py-2 flex items-center gap-2 text-xs font-bold">
+            <i class="ph ph-sun-dim text-amber-400 text-lg"></i>
+            <span>讀取中...</span>
+        </div>
+    </div>
+
+    <!-- Main Scroll Content -->
+    <div class="pt-24 pb-32">
+        <!-- Swipeable Carousel -->
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" onclick="window.openSection('attractionModal', 'taipei101')">
+                    <img src="./public/taipei101.png" class="w-full h-full object-cover">
+                    <div class="slide-content">
+                        <span class="text-xs font-bold text-accent uppercase tracking-widest text-red-500">Must Visit</span>
+                        <h3 class="text-xl font-bold mt-1">台北 101</h3>
+                        <p class="text-xs text-slate-300 mt-1">俯瞰城市天際線的極致體驗</p>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="window.openSection('attractionModal', 'taroko')">
+                    <img src="./public/taroko.png" class="w-full h-full object-cover">
+                    <div class="slide-content">
+                        <span class="text-xs font-bold text-green-400 uppercase tracking-widest">Nature</span>
+                        <h3 class="text-xl font-bold mt-1">太魯閣峽谷</h3>
+                        <p class="text-xs text-slate-300 mt-1">壯麗的大理石切割峽谷奇觀</p>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="window.openSection('attractionModal', 'jiufen')">
+                    <img src="./public/jiufen.png" class="w-full h-full object-cover">
+                    <div class="slide-content">
+                        <span class="text-xs font-bold text-orange-400 uppercase tracking-widest">Culture</span>
+                        <h3 class="text-xl font-bold mt-1">九份老街</h3>
+                        <p class="text-xs text-slate-300 mt-1">宮崎駿靈感來源的山城美景</p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- Dashboard Navigation -->
+        <div class="px-6 -mt-8">
+            <h2 class="text-lg font-bold mb-4 opacity-80">快速服務</h2>
+            <div class="nav-grid">
+                <div class="nav-item" onclick="window.openModal('airportModal')">
+                    <div class="icon-circle text-sky-400"><i class="ph ph-airplane"></i></div>
+                    <span class="text-[11px] font-bold">機場交通</span>
+                </div>
+                <div class="nav-item" onclick="window.openModal('mapModal')">
+                    <div class="icon-circle text-orange-400"><i class="ph ph-train"></i></div>
+                    <span class="text-[11px] font-bold">台北捷運</span>
+                </div>
+                <div class="nav-item" onclick="window.openModal('boatModal')">
+                    <div class="icon-circle text-indigo-400"><i class="ph ph-path"></i></div>
+                    <span class="text-[11px] font-bold">城際交通</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='food.html'">
+                    <div class="icon-circle text-red-400"><i class="ph ph-fork-knife"></i></div>
+                    <span class="text-[11px] font-bold">美食探索</span>
+                </div>
+                <div class="nav-item" onclick="window.openModal('attractionModal')">
+                    <div class="icon-circle text-purple-400"><i class="ph ph-camera"></i></div>
+                    <span class="text-[11px] font-bold">必訪景點</span>
+                </div>
+                <div class="nav-item" onclick="window.openModal('itinModal')">
+                    <div class="icon-circle text-teal-400"><i class="ph ph-calendar-check"></i></div>
+                    <span class="text-[11px] font-bold">行程規劃</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals (Simplified for Redesign) -->
+    <!-- Add Modals code here -->
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+// --- Taiwan MRT/HSR/TRA Data ---
+const MRT_DATA = [
+    {
+        line: "🔵 板南線 (Blue Line)", items: [
+            "[BL11] 西門 (Ximen)：西門町商圈、紅樓。",
+            "[BL12] 台北車站 (Taipei Main Station)：【重要轉乘站】高鐵/台鐵/捷運、地下街。",
+            "[BL15] 忠孝復興 (Zhongxiao Fuxing)：SOGO百貨、東區商圈。",
+            "[BL18] 市政府 (Taipei City Hall)：信義商圈、台北101、統一時代百貨。",
+            "[BL23] 南港展覽館 (Taipei Nangang Exhibition Center)：展覽館、轉乘文湖線。"
+        ]
+    },
+    {
+        line: "🔴 淡水信義線 (Red Line)", items: [
+            "[R05] 台北101/世貿 (Taipei 101/World Trade Center)：台北101、景觀台。",
+            "[R08] 中正紀念堂 (Chiang Kai-shek Memorial Hall)：中正紀念堂、兩廳院。",
+            "[R11] 中山 (Zhongshan)：心中山線形公園、誠品、南西商圈。",
+            "[R13] 民權西路 (Minquan W. Rd.)：【轉乘站】中和新蘆線。",
+            "[R14] 圓山 (Yuanshan)：花博公園、MAJI集食行樂。",
+            "[R16] 士林 (Shilin)：轉乘公車前往「故宮博物院」、「士林官邸」。",
+            "[R17] 劍潭 (Jiantan)：士林夜市。",
+            "[R22] 北投 (Beitou)：北投溫泉博物館、地熱谷。",
+            "[R28] 淡水 (Tamsui)：淡水老街、漁人碼頭。"
+        ]
+    },
+    {
+        line: "🟢 松山新店線 (Green Line)", items: [
+            "[G12] 西門 (Ximen)。",
+            "[G13] 北門 (Beimen)：大稻埕碼頭、迪化街。",
+            "[G15] 松江南京 (Songjiang Nanjing)：【轉乘站】中和新蘆線。",
+            "[G19] 松山 (Songshan)：饒河街夜市、慈祐宮。"
+        ]
+    },
+    {
+        line: "🚆 台灣高鐵 (HSR)", items: [
+            "[HSR01] 台北 (Taipei)",
+            "[HSR04] 台中 (Taichung)",
+            "[HSR06] 嘉義 (Chiayi)",
+            "[HSR07] 台南 (Tainan)",
+            "[HSR08] 左營/高雄 (Zuoying/Kaohsiung)"
+        ]
+    }
+];
+
+window.MRT_DATA = MRT_DATA;
+
+
+        // Swiper Init
+        var swiper = new Swiper(".mySwiper", {
+            effect: "cards",
+            grabCursor: true,
+            pagination: {
+                el: ".swiper-pagination",
+                dynamicBullets: true,
+            },
+        });
+
+        // Time Updates
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('datetime-display').textContent = now.toLocaleTimeString('zh-TW', { hour12: false }) + ' TAIPEI';
+        }, 1000);
+
+        // Weather Fetch
+        fetch('http://localhost:3001/api/weather?city=Taipei')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('weather-status').innerHTML = `<i class="ph ph-cloud-sun text-sky-400 text-lg"></i> <span>${data.temp}°C ${data.condition}</span>`;
+            })
+            .catch(() => {
+                document.getElementById('weather-status').innerHTML = `<i class="ph ph-sun-dim text-amber-400 text-lg"></i> <span>25°C 晴朗</span>`;
+            });
+
+        function openModal(id) {
+            // Simplified modal open logic
+            console.log("Opening modal:", id);
+                    // MRT Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const mo = document.getElementById('mrt-origin'), md = document.getElementById('mrt-dest');
+            MRT_DATA.forEach(g => {
+                let optGroup = document.createElement('optgroup');
+                optGroup.label = g.line;
+                g.items.forEach(i => {
+                    let opt = document.createElement('option');
+                    let code = i.split(']')[0] + ']';
+                    opt.value = code;
+                    opt.textContent = i;
+                    optGroup.appendChild(opt);
+                });
+                mo.appendChild(optGroup.cloneNode(true));
+                md.appendChild(optGroup);
+            });
+        });
+
+        window.calcMrt = () => {
+            const o = document.getElementById('mrt-origin').value, d = document.getElementById('mrt-dest').value;
+            if(!o || !d) return;
+            document.getElementById('mrt-result').classList.remove('hidden');
+            // Simplified for now
+            document.getElementById('mrt-time-display').textContent = '約 ' + (Math.floor(Math.random()*20) + 10) + ' 分鐘';
+        };
+        }
+        
+        function openSection(modalId, attractionKey) {
+            console.log("Jumping to:", attractionKey);
+            showToast(`正在導覽至: ${attractionKey}`);
+        }
+        
+        function showToast(msg) {
+            // Toast logic
+        }
+    </script>
+</body>
+</html>
+
+
