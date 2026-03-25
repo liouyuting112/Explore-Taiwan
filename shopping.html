@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣購物攻略 | Explore Taiwan Shopping</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background: #f8fafc; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-btn.active { background-color: #db2777; color: white; border-color: #db2777; }
+        .shop-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+        .shop-card { transition: all 0.2s; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+<header class="bg-gradient-to-r from-pink-600 to-rose-500 text-white sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold">🛍️ 台灣購物攻略</h1>
+        <a href="index.html" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-bold rounded-full transition-colors">
+            🏠 回首頁
+        </a>
+    </div>
+</header>
+
+<!-- Hero -->
+<div class="bg-gradient-to-br from-pink-50 to-rose-50 py-10 px-4 text-center">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-3">台灣必買購物指南</h2>
+    <p class="text-gray-500 max-w-xl mx-auto">夜市特色品、百貨精品區、台灣獨有伴手禮、文創設計品——從百元到萬元都有推薦</p>
+</div>
+
+<!-- Info Banner -->
+<div class="container mx-auto px-4 py-5">
+    <div class="bg-pink-50 border border-pink-200 rounded-2xl p-4 flex gap-3 items-start">
+        <span class="text-2xl">💡</span>
+        <div class="text-sm text-pink-800">
+            <strong>購物小提醒：</strong>外籍旅客在台灣同一商店單日消費滿 NT$2,000 可申請退稅（VAT 5%）。桃園機場有退稅服務台。百貨公司週年慶（9-11月）折扣最大。
+        </div>
+    </div>
+</div>
+
+<!-- Category Tabs -->
+<div class="sticky top-[64px] bg-white shadow-sm z-40">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex overflow-x-auto scrollbar-hide gap-2">
+            <button onclick="filterShop('all',this)" class="tab-btn active whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🛍️ 全部</button>
+            <button onclick="filterShop('nightmarket',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🌃 夜市購物</button>
+            <button onclick="filterShop('mall',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🏬 百貨商圈</button>
+            <button onclick="filterShop('souvenir',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🎁 伴手禮</button>
+            <button onclick="filterShop('creative',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🎨 文創設計</button>
+            <button onclick="filterShop('beauty',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">💄 美妝保養</button>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-6 pb-16">
+    <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</div>
+
+<script>
+const SHOPS = [
+    { cat:'nightmarket', icon:'🌃', name:'士林夜市', city:'台北', location:'捷運劍潭站步行5分鐘',
+      desc:'台灣規模最大夜市，服飾、飾品、3C配件、鞋子齊全，地下美食城是台灣最具代表性的夜市美食集散地。',
+      hours:'17:00–24:00', tip:'週末人多，建議平日晚上前往，討價還價是文化', price:'各攤不定', badge:'最大夜市' },
+    { cat:'nightmarket', icon:'🏮', name:'饒河街觀光夜市', city:'台北', location:'捷運松山站步行5分鐘',
+      desc:'比士林更精緻的觀光夜市，約600公尺直線設計，購物服飾與飲食均衡，是台北最適合初次造訪者的夜市選擇。',
+      hours:'17:00–23:00', tip:'胡椒餅排隊必買；服飾攤位集中於中段', price:'各攤不定', badge:'精品夜市' },
+    { cat:'nightmarket', icon:'🎡', name:'逢甲夜市', city:'台中', location:'台中市西屯區',
+      desc:'以面積計台灣最大夜市，服飾和鞋類選擇豐富，價格比台北更實惠。台中在地品牌和小店也聚集於此商圈周邊。',
+      hours:'16:00–02:00', tip:'服飾區在夜市外圍，美食集中在核心區域', price:'各攤不定', badge:'全台最大' },
+    { cat:'mall', icon:'🏬', name:'信義商圈（台北101周邊）', city:'台北', location:'捷運台北101/世貿站',
+      desc:'台北最頂級購物商圈。微風信義、ATT 4 Fun、統一時代、台北101精品樓層、新光三越A11/A9一字排開，全台精品品牌應有盡有。',
+      hours:'11:00–22:00', tip:'外籍旅客購物NT$2000以上可在信義商圈集中辦退稅', price:'中高端', badge:'精品聖地' },
+    { cat:'mall', icon:'📚', name:'誠品生活 eslite', city:'全台', location:'松菸/信義/南西等多處',
+      desc:'台灣最具特色的書店文創複合空間。松山文創園區店24小時不打烊。設計精品、台灣設計師品牌、文具、書籍齊全，是體驗台灣文化的必訪之地。',
+      hours:'各店不同，松菸店24小時', tip:'誠品選品以台灣本土設計師商品為主，是最好的「台灣設計」購物地', price:'中高端', badge:'台灣文化' },
+    { cat:'mall', icon:'🛒', name:'家樂福 / 全聯超市', city:'全台', location:'各城市均有多家',
+      desc:'台灣最普遍的超市賣場，可採購台灣零食、泡麵、飲料等作為伴手禮。價格是最便宜的選擇，台灣特色零食在此最齊全。',
+      hours:'08:00–22:00（各店不同）', tip:'台灣零食伴手禮推薦：乖乖、波卡、台灣啤酒、各式泡麵', price:'平價', badge:'零食掃貨' },
+    { cat:'souvenir', icon:'🍍', name:'鳳梨酥 Pineapple Cake', city:'全台', location:'各大糕餅店',
+      desc:'台灣第一伴手禮！佳德糕餅（南京復興）、微熱山丘（信義/仁愛路旗艦）是最受推薦的兩家，口感和品質都是頂級。',
+      hours:'各店不同', tip:'佳德常大排長龍，建議平日早上前往；微熱山丘提供試吃服務', price:'NT$150-350/盒（10片）', badge:'伴手禮首選' },
+    { cat:'souvenir', icon:'🍵', name:'台灣茶葉', city:'阿里山/梨山/坪林', location:'茶行/農場',
+      desc:'世界頂級烏龍茶產地。阿里山高山烏龍、梨山高冷茶、日月潭紅茶、坪林包種茶，是最具台灣特色的高端伴手禮。',
+      hours:'各店不同', tip:'天仁茗茶（全台連鎖）方便購買；茶農直銷品質更好、價格更實惠', price:'NT$200-3000/100g', badge:'高端伴手禮' },
+    { cat:'souvenir', icon:'🍬', name:'牛軋糖 & 傳統糕點', city:'全台', location:'夜市/伴手禮店',
+      desc:'牛軋糖以奶油、花生、蔓越莓製成，Q彈不黏牙。太陽餅（台中）、鳳凰酥、綠豆椪等台式糕點也是熱門伴手禮。',
+      hours:'各店不同', tip:'黑橋牌（台南）和各地老字號各有特色配方，建議試吃後購買', price:'NT$100-300/盒', badge:'台式點心' },
+    { cat:'souvenir', icon:'🧴', name:'台灣本土保養品', city:'全台', location:'各百貨/連鎖',
+      desc:'森田藥粧（日本製造但在台灣超值）、Dr. Wu 達爾膚、Dr. Jart+台灣版等本土品牌，價格遠比台灣以外便宜，是保養愛好者掃貨的好地方。',
+      hours:'各店不同', tip:'台灣屈臣氏和康是美價格比香港/中國低，值得採購', price:'各不同', badge:'保養掃貨' },
+    { cat:'creative', icon:'🎨', name:'華山1914文創園區', city:'台北', location:'捷運忠孝新生站步行5分鐘',
+      desc:'由日治時代酒廠改建的文創基地，週末定期舉辦設計師市集、展覽和表演。裡面的選品店有許多台灣獨立設計師的特色商品。',
+      hours:'週二-日 11:00–21:00（戶外全天）', tip:'週末市集通常10:00-20:00，官網可查活動時程', price:'各不同', badge:'設計師品牌' },
+    { cat:'creative', icon:'🏭', name:'松山文創園區', city:'台北', location:'捷運國父紀念館站步行5分鐘',
+      desc:'原台北菸廠改建，連結誠品松菸生活館（24小時）。Pinkoi設計師品牌集結，各式台灣品牌的特色商品在此可以一次找到。',
+      hours:'07:00–22:00', tip:'誠品松菸館深夜也開，是台北最獨特的深夜購物體驗', price:'各不同', badge:'Pinkoi聖地' },
+    { cat:'creative', icon:'🎪', name:'迪化街 Dihua Street', city:'台北', location:'大橋頭捷運站步行10分鐘',
+      desc:'台北百年南北貨市場，近年轉型為文創聚集地。年貨、中藥、布料、老建築改建的咖啡廳和選品店並存，是最有台北老味道的街道。',
+      hours:'各店不同，通常 10:00–18:00', tip:'農曆年前「年貨大街」是最熱鬧時節；平時週末人潮較少', price:'各不同', badge:'百年老街' },
+    { cat:'beauty', icon:'💄', name:'台灣藥妝（屈臣氏/康是美）', city:'全台', location:'各大城市均有',
+      desc:'台灣藥妝連鎖價格實惠，日系和韓系品牌常有折扣。森田藥粧、My Scheming（我的美麗日記）等台灣面膜品牌在此最便宜。',
+      hours:'09:00–22:00', tip:'購買面膜以10片裝為單位最划算；會員辦理可享積點折扣', price:'各不同', badge:'CP值極高' },
+    { cat:'beauty', icon:'🧖', name:'台灣面膜品牌', city:'全台', location:'屈臣氏/康是美/超市',
+      desc:'台灣是亞洲面膜生產重鎮！我的美麗日記、森田藥粧、Dr.Wu等台灣品牌，品質一流但價格遠低於其他國家，是美妝愛好者必掃品。',
+      hours:'各通路不同', tip:'10片裝面膜約NT$100-200，是台灣最超值的美容伴手禮', price:'NT$100-300/盒', badge:'台灣之光' },
+];
+
+function filterShop(cat, btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const items = cat==='all' ? SHOPS : SHOPS.filter(s=>s.cat===cat);
+    renderShops(items);
+}
+
+function renderShops(items){
+    document.getElementById('shop-grid').innerHTML = items.map(s=>`
+        <div class="shop-card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col">
+            <div class="flex items-start gap-3 mb-3">
+                <span class="text-4xl">${s.icon}</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="font-bold text-gray-800 text-base leading-tight">${s.name}</h3>
+                        ${s.badge?`<span class="px-2 py-0.5 bg-pink-100 text-pink-700 text-xs font-bold rounded-full">${s.badge}</span>`:''}
+                    </div>
+                    <p class="text-xs text-gray-400 mt-0.5">📍 ${s.location} · ${s.city}</p>
+                </div>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed mb-3 flex-1">${s.desc}</p>
+            <div class="bg-pink-50 rounded-xl p-3 text-xs text-pink-800 mb-3">💡 ${s.tip}</div>
+            <div class="flex gap-2 flex-wrap text-xs">
+                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">⏰ ${s.hours}</span>
+                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">💰 ${s.price}</span>
+            </div>
+        </div>`).join('');
+}
+
+renderShops(SHOPS);
+</script>
+</body>
+</html>

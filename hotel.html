@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣住宿推薦 | Explore Taiwan Hotels</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background: #f8fafc; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-btn.active { background-color: #7c3aed; color: white; border-color: #7c3aed; }
+        .hotel-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+        .hotel-card { transition: all 0.2s; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+<header class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold">🏨 台灣住宿推薦</h1>
+        <a href="index.html" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-bold rounded-full transition-colors">
+            🏠 回首頁
+        </a>
+    </div>
+</header>
+
+<!-- Hero -->
+<div class="bg-gradient-to-br from-violet-50 to-indigo-50 py-10 px-4 text-center">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-3">台灣全島住宿精選</h2>
+    <p class="text-gray-500 max-w-xl mx-auto">從五星豪華到特色民宿，找到最適合你的住宿——依城市、預算一鍵篩選</p>
+</div>
+
+<!-- Tips Banner -->
+<div class="container mx-auto px-4 py-5">
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex gap-3 items-start">
+        <span class="text-2xl">💡</span>
+        <div class="text-sm text-blue-800">
+            <strong>訂房建議：</strong>旺季（7-8月暑假、春節、連假）建議提早2-4週訂房。台北信義/大安區生活機能最佳；高雄、台南住宿性價比通常更高。
+        </div>
+    </div>
+</div>
+
+<!-- City Tabs -->
+<div class="sticky top-[64px] bg-white shadow-sm z-40">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex overflow-x-auto scrollbar-hide gap-2">
+            <button onclick="filterCity('all',this)" class="tab-btn active whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🌟 全部</button>
+            <button onclick="filterCity('taipei',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🏙️ 台北</button>
+            <button onclick="filterCity('taichung',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">⛰️ 台中</button>
+            <button onclick="filterCity('tainan',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🏛️ 台南</button>
+            <button onclick="filterCity('kaohsiung',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🌺 高雄</button>
+            <button onclick="filterCity('hualien',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🏔️ 花蓮</button>
+            <button onclick="filterCity('special',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">✨ 特色住宿</button>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-6 pb-16">
+    <div id="hotel-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</div>
+
+<script>
+const HOTELS = [
+    { city:'taipei', budget:'luxury', icon:'👑', stars:5, name:'君品酒店 Palais de Chine', area:'台北車站 · 交通最便利',
+      desc:'位於台北車站正上方，法式宮廷風格裝潢，連結新光三越與Q廣場。直接連通高鐵、台鐵、捷運，是重行李旅客的最佳選擇。',
+      price:'NT$8,000', priceNote:'起/晚', badge:'超便利', link:'https://www.agoda.com/zh-tw/palais-de-chine-hotel/' },
+    { city:'taipei', budget:'luxury', icon:'🎸', stars:5, name:'W Taipei', area:'信義商圈 · 台北101旁',
+      desc:'設計師酒店，位於台北最時尚的信義商圈，鄰近台北101。前衛現代設計，WET泳池酒吧俯瞰城市夜景，是追求潮流旅客的首選。',
+      price:'NT$9,000', priceNote:'起/晚', badge:'設計酒店', link:'https://www.agoda.com/zh-tw/w-taipei/' },
+    { city:'taipei', budget:'luxury', icon:'🌿', stars:5, name:'台北文華東方酒店 Mandarin Oriental', area:'敦化北路 · 中山商圈',
+      desc:'台北頂級豪華酒店，獲評亞洲最佳酒店。提供台北最具盛名的高空餐廳、頂樓無邊際泳池、世界級SPA中心。',
+      price:'NT$12,000', priceNote:'起/晚', badge:'頂級奢華', link:'https://www.agoda.com/zh-tw/mandarin-oriental-taipei/' },
+    { city:'taipei', budget:'mid', icon:'🏢', stars:4, name:'老爺行旅 The Place Taipei', area:'南京東路 · 中山商圈',
+      desc:'台灣本土設計旅館品牌，以台灣文化設計貫穿空間，位於中山商圈，鄰近精品街、誠品南西，出行方便，性價比高。',
+      price:'NT$3,500', priceNote:'起/晚', badge:'本土品牌', link:'https://www.theplacetaipei.com.tw/' },
+    { city:'taipei', budget:'mid', icon:'🌆', stars:4, name:'台北福華大飯店 Howard Plaza', area:'信義路 · 大安區',
+      desc:'台北經典五星飯店，鄰近大安森林公園和師大商圈，提供豐盛台式自助早餐。外觀簡約典雅，是長輩和家庭旅遊的理想選擇。',
+      price:'NT$4,000', priceNote:'起/晚', badge:'家庭首選', link:'https://www.agoda.com/zh-tw/howard-plaza-hotel/' },
+    { city:'taipei', budget:'budget', icon:'🛏️', stars:3, name:'康橋商旅 Kindness Hotel', area:'全台多處 · 連鎖品牌',
+      desc:'台灣最受旅客信賴的本土連鎖商旅，各大城市皆有分店。提供台式早餐、悠遊卡借用、自助洗衣等實用服務，是背包客熱門選擇。',
+      price:'NT$1,200', priceNote:'起/晚', badge:'超值連鎖', link:'https://www.kindness-hotel.com.tw/' },
+    { city:'taichung', budget:'mid', icon:'🌳', stars:4, name:'薆悅酒店 Gala Hotel', area:'台中市中心',
+      desc:'台中知名設計旅館，鄰近逢甲夜市和台中新站，交通便利。餐廳提供台式早餐，夜晚步行即達逢甲夜市，適合以台中為基地者。',
+      price:'NT$2,800', priceNote:'起/晚', badge:'夜市旁', link:'https://www.agoda.com/zh-tw/gala-hotel/' },
+    { city:'taichung', budget:'luxury', icon:'🏛️', stars:5, name:'亞緻大飯店 AXIA Hotel', area:'台中南屯 · 七期商圈',
+      desc:'台中最受歡迎的五星飯店，位於台中最繁華的七期商圈。鄰近新光三越、大遠百百貨，提供豐盛早餐和頂樓泳池。',
+      price:'NT$5,000', priceNote:'起/晚', badge:'商圈中心', link:'https://www.agoda.com/zh-tw/axia-hotel-taichung/' },
+    { city:'tainan', budget:'mid', icon:'🏛️', stars:4, name:'台南晶英酒店 Silks Place', area:'台南市中心 · 孔廟旁',
+      desc:'台南最知名的精品酒店，鄰近台南孔廟和中正商圈。提供精緻台南料理早餐，步行即達赤崁樓、林百貨等古蹟景點。',
+      price:'NT$4,500', priceNote:'起/晚', badge:'古蹟旁', link:'https://www.agoda.com/zh-tw/silks-place-tainan/' },
+    { city:'tainan', budget:'budget', icon:'🏡', stars:3, name:'老爺酒店系列 Hotel Royal', area:'台南市各區',
+      desc:'台南著名連鎖旅館，性價比極佳。位置便利，提供自行車租借，方便探索台南各處古蹟小吃，是背包客和省錢旅行者的熱門選擇。',
+      price:'NT$1,800', priceNote:'起/晚', badge:'省錢首選', link:'https://www.agoda.com/zh-tw/hotel-royal-tainan/' },
+    { city:'kaohsiung', budget:'luxury', icon:'🌺', stars:5, name:'漢來大飯店 Grand Hi-Lai', area:'苓雅區 · 高雄代表飯店',
+      desc:'高雄最具代表性的頂級飯店，47層樓俯瞰愛河與高雄港。頂樓觀景餐廳是高雄最佳夜景之一，連接漢神巨蛋商圈。',
+      price:'NT$5,000', priceNote:'起/晚', badge:'高雄地標', link:'https://www.agoda.com/zh-tw/grand-hi-lai-hotel/' },
+    { city:'kaohsiung', budget:'mid', icon:'🌊', stars:4, name:'高雄義大皇家酒店 E-DA Royal', area:'大樹區 · 義大世界',
+      desc:'高雄郊區的主題樂園式度假酒店，義大世界購物中心和義大遊樂世界就在旁邊。適合親子家庭和想要度假型體驗的旅客。',
+      price:'NT$3,500', priceNote:'起/晚', badge:'主題樂園旁', link:'https://www.agoda.com/zh-tw/e-da-royal-hotel/' },
+    { city:'hualien', budget:'mid', icon:'🏔️', stars:4, name:'花蓮翰品酒店 Chateau de Chine', area:'花蓮市 · 火車站旁',
+      desc:'花蓮市中心精品旅館，距花蓮火車站步行10分鐘，太魯閣一日遊最理想基地。法式早餐豐盛，服務細膩，房間景觀優美。',
+      price:'NT$3,000', priceNote:'起/晚', badge:'太魯閣出發點', link:'https://www.agoda.com/zh-tw/chateau-de-chine-hualien/' },
+    { city:'hualien', budget:'budget', icon:'🌿', stars:3, name:'花蓮理想大地 La Vie Resort', area:'壽豐鄉 · 湖光山色',
+      desc:'花蓮縣著名的歐風莊園式度假村，鄰近理想大地農場。群山湖泊美景令人心曠神怡，提供自行車租借，適合慢活旅遊。',
+      price:'NT$2,000', priceNote:'起/晚', badge:'景觀農場', link:'https://www.agoda.com/zh-tw/la-vie-resort/' },
+    { city:'special', budget:'unique', icon:'♨️', stars:4, name:'礁溪老爺酒店', area:'宜蘭礁溪 · 溫泉勝地',
+      desc:'宜蘭礁溪著名的溫泉旅館，客房內附設獨立溫泉浴池。碳酸氫鈉泉質地滑順，號稱「美人湯」。距台北火車約50分鐘，是一日或兩日溫泉行的理想選擇。',
+      price:'NT$6,000', priceNote:'起/晚（含溫泉）', badge:'溫泉必住', link:'https://www.agoda.com/zh-tw/hotel-royal-chiao-hsi/' },
+    { city:'special', budget:'unique', icon:'🌲', stars:4, name:'阿里山賓館', area:'嘉義阿里山 · 海拔2200m',
+      desc:'阿里山國家森林遊樂區內唯一的歷史旅館，建於日治時期，保有古典木造風格。在這裡可以清晨看日出、夜晚賞星空，是台灣最特別的住宿體驗之一。',
+      price:'NT$4,000', priceNote:'起/晚', badge:'高山日出', link:'https://www.agoda.com/zh-tw/alishan-house/' },
+    { city:'special', budget:'unique', icon:'🏝️', stars:3, name:'澎湖民宿群', area:'澎湖馬公 · 島嶼風情',
+      desc:'澎湖有豐富的特色民宿選擇，許多位於海邊或古厝改建。提供浮潛、自行車租借、海鮮午晚餐等套裝服務，是體驗台灣海島生活的最佳選擇。',
+      price:'NT$1,500', priceNote:'起/晚', badge:'海島體驗', link:'https://www.booking.com/searchresults/tw/penghu.html' },
+];
+
+function filterCity(city, btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const items = city==='all' ? HOTELS : HOTELS.filter(h=>h.city===city);
+    renderHotels(items);
+}
+
+function renderHotels(items){
+    const stars = n => '⭐'.repeat(n);
+    document.getElementById('hotel-grid').innerHTML = items.map(h=>`
+        <div class="hotel-card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col">
+            <div class="flex items-start gap-3 mb-3">
+                <span class="text-4xl">${h.icon}</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="font-bold text-gray-800 text-base leading-tight">${h.name}</h3>
+                        ${h.badge?`<span class="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-bold rounded-full">${h.badge}</span>`:''}
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">📍 ${h.area}</p>
+                    <p class="text-sm mt-0.5">${stars(h.stars)}</p>
+                </div>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4 flex-1">${h.desc}</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <span class="text-violet-700 font-extrabold text-lg">${h.price}</span>
+                    <span class="text-gray-400 text-xs ml-1">${h.priceNote}</span>
+                </div>
+                <a href="${h.link}" target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-1 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                    查看訂房 →
+                </a>
+            </div>
+        </div>`).join('');
+}
+
+renderHotels(HOTELS);
+</script>
+</body>
+</html>
