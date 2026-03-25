@@ -1,367 +1,149 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台灣行程推薦指南 | Taiwan Trip Guide</title>
-    
-    <!-- 引入 Tailwind CSS (CDN) -->
+    <title>台灣行程 & 活動推薦 | Explore Taiwan Trips</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 引入 React & ReactDOM (CDN) -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- 引入 Babel 用於在瀏覽器中編譯 JSX (CDN) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* 隱藏水平捲軸但保留滾動功能 */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        body { font-family: 'Noto Sans TC', sans-serif; background: #f8fafc; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-btn.active { background-color: #0284c7; color: white; border-color: #0284c7; }
+        .trip-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+        .trip-card { transition: all 0.2s; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="text-gray-800">
 
-    <script type="text/babel">
-        const { useState } = React;
+<header class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold">🗺️ 台灣行程推薦</h1>
+        <a href="index.html" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-bold rounded-full transition-colors">
+            🏠 回首頁
+        </a>
+    </div>
+</header>
 
-        // --- 定義 SVG 圖示元件 ---
-        const MapPin = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
-        const Ticket = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>;
-        const Sun = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
-        const Utensils = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>;
-        const Sparkles = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
-        const TrainFront = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="M9 15h6"/><path d="M14 19.5l3-3-3-3"/><path d="M10 19.5l-3-3 3-3"/><path d="M4 22v-3.5"/><path d="M20 22v-3.5"/><rect width="16" height="16" x="4" y="3" rx="2"/></svg>;
-        const ExternalLink = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>;
-        const Info = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
-        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+<!-- Hero -->
+<div class="bg-gradient-to-br from-blue-50 to-cyan-50 py-10 px-4 text-center">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-3">台灣精選活動與行程</h2>
+    <p class="text-gray-500 max-w-xl mx-auto">一日遊、體驗行程、交通套票——用最聰明的方式玩遍台灣</p>
+</div>
 
-        // 定義台灣版本分類與圖示
-        const CATEGORIES = [
-            { id: '門票', icon: Ticket },
-            { id: '一日遊', icon: Sun },
-            { id: '美食餐廳', icon: Utensils },
-            { id: '汗蒸幕與體驗', icon: Sparkles },
-            { id: '交通及網路', icon: TrainFront }
-        ];
+<!-- Category Tabs -->
+<div class="sticky top-[64px] bg-white shadow-sm z-40">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex overflow-x-auto scrollbar-hide gap-2">
+            <button onclick="filterTrip('all',this)" class="tab-btn active whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🌟 全部</button>
+            <button onclick="filterTrip('pass',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🎫 通行證 & 套票</button>
+            <button onclick="filterTrip('daytrip',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🚌 一日遊</button>
+            <button onclick="filterTrip('experience',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🎭 特色體驗</button>
+            <button onclick="filterTrip('transport',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🚇 交通 & 網路</button>
+            <button onclick="filterTrip('attraction',this)" class="tab-btn whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 bg-white text-gray-700 font-semibold text-sm">🗼 景點門票</button>
+        </div>
+    </div>
+</div>
 
-        // 台灣周邊區域
-        const REGIONS = ['台灣', '慶州', '大邱'];
+<div class="container mx-auto px-4 py-6">
+    <!-- Klook Banner -->
+    <div class="bg-gradient-to-r from-orange-500 to-amber-400 rounded-2xl p-5 mb-6 flex gap-4 items-center text-white">
+        <span class="text-4xl">🎟️</span>
+        <div class="flex-1">
+            <h3 class="font-extrabold text-lg">Klook Taiwan — 台灣活動票券平台</h3>
+            <p class="text-sm opacity-90 mt-1">提前預訂台灣門票、體驗活動、一日遊行程，享有線上專屬折扣，免去現場排隊購票的麻煩。</p>
+        </div>
+        <a href="https://www.klook.com/zh-TW/taiwan/" target="_blank" rel="noopener"
+           class="bg-white text-orange-600 font-bold text-sm px-5 py-2.5 rounded-full whitespace-nowrap hover:bg-orange-50 transition-colors">
+            前往 Klook →
+        </a>
+    </div>
+    <div id="trip-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-16"></div>
+</div>
 
-        // 取得指定地區可用的分類
-        const getAvailableCategoryIds = (region) => {
-            if (region === '慶州' || region === '大邱') return ['門票', '一日遊', '交通及網路'];
-            return ['門票', '一日遊', '美食餐廳', '汗蒸幕與體驗', '交通及網路'];
-        };
+<script>
+const TRIPS = [
+    { cat:'pass', icon:'🎫', badge:'超值推薦', name:'台北旅遊卡 Taipei Fun Pass', region:'台北',
+      desc:'含台北101觀景台、貓空纜車、各大博物館等超過20個景點免費入場。一張卡遊台北，省去逐一購票的麻煩，適合3-5天深度遊台北的旅客。',
+      price:'NT$1,200起', duration:'1-5天可選', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'pass', icon:'🚄', badge:'高CP值', name:'台灣高鐵3日/5日券', region:'全台',
+      desc:'外籍旅客限定！持護照購買，可在效期內無限次搭乘台灣高鐵（北高間）。3日券NT$2,180，相當於台北→高雄來回即回本，是南北串遊的最聰明選擇。',
+      price:'NT$2,180起', duration:'3天或5天', link:'https://www.klook.com/zh-TW/activity/2847-taiwan-high-speed-rail-pass/' },
+    { cat:'pass', icon:'🚇', badge:'交通必備', name:'台北悠遊卡 + 機場捷運1日券', region:'台北',
+      desc:'機場捷運1日券含桃園機場到台北市區的來回票，加上悠遊卡不限次搭乘台北捷運，是第一天抵台最划算的套裝組合。',
+      price:'NT$350起', duration:'1天', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'daytrip', icon:'🏮', badge:'最熱門', name:'九份&野柳一日遊', region:'台北出發',
+      desc:'台灣最受歡迎的一日遊行程！遊覽依山而建的九份老街、野柳地質公園的女王頭奇岩，以及十分放天燈體驗。含專車接送，省去規劃交通的麻煩。',
+      price:'NT$1,200起', duration:'約8小時', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'daytrip', icon:'🏔️', badge:'自然必訪', name:'太魯閣一日遊（花蓮出發）', region:'花蓮',
+      desc:'走訪台灣最壯麗的自然奇景！遊覽燕子口步道、布洛灣、長春祠，有專業導遊介紹太魯閣地質與原住民文化，含保險和入山申請代辦。',
+      price:'NT$800起', duration:'約7小時', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'daytrip', icon:'🌊', badge:'離島特色', name:'小琉球浮潛一日遊', region:'屏東出發',
+      desc:'從東港搭船前往小琉球，體驗珊瑚礁浮潛與海龜共游。含船票、浮潛設備、教練指導，是台灣最輕鬆的海洋體驗之一，全年皆可成行。',
+      price:'NT$1,500起', duration:'全天', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'daytrip', icon:'🌲', badge:'高山體驗', name:'阿里山森林鐵路&日出一日遊', region:'嘉義出發',
+      desc:'搭乘百年森林小火車穿梭神木林，清晨觀賞日出雲海，春天賞吉野櫻花。含往返交通、入園門票，以及導遊帶領的神木步道健行。',
+      price:'NT$2,000起', duration:'全天（需清晨出發）', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'experience', icon:'🍜', badge:'美食必做', name:'台北夜市美食小吃導覽', region:'台北',
+      desc:'跟隨在地導遊深入士林或饒河夜市，品嚐大香腸、蚵仔煎、珍珠奶茶等10種以上台灣道地小吃，了解每道小吃背後的台灣文化故事。',
+      price:'NT$800起', duration:'約3小時', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'experience', icon:'🎋', badge:'文化體驗', name:'原住民文化體驗（烏來/花蓮）', region:'台北/花蓮',
+      desc:'親身體驗台灣原住民族文化，包含傳統歌舞表演、手工藝教學（月桃編織、箭竹料理）、部落導覽，以及原住民特色餐飲，認識台灣最深層的文化根源。',
+      price:'NT$1,200起', duration:'約4小時', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'experience', icon:'🧋', badge:'台灣之光', name:'珍珠奶茶 DIY 製作體驗', region:'台北/台中',
+      desc:'親手製作台灣發明的珍珠奶茶！從煮粉圓開始，調配茶底、奶製品和甜度，帶回家的不只是一杯飲品，更是一份珍貴的台灣記憶。',
+      price:'NT$600起', duration:'約1.5小時', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'transport', icon:'📶', badge:'必備上網', name:'台灣5G SIM卡（機場取件）', region:'全台',
+      desc:'提早預訂，抵台後在桃園機場領取5G SIM卡，立即啟用上網。中華電信/台灣之星網路穩定覆蓋全台，5天無限量方案是最受歡迎選擇。',
+      price:'NT$300起', duration:'3/5/7/10天可選', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'transport', icon:'🚡', badge:'省錢必備', name:'桃園機場捷運1日票', region:'台北',
+      desc:'機場捷運1日不限次乘車票，含機場到台北車站的來回，以及沿線各站。特別適合第一天從機場入市區，或最後一天從市區回機場的行程。',
+      price:'NT$180起', duration:'1天', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'attraction', icon:'🏙️', badge:'台北地標', name:'台北101 觀景台門票', region:'台北',
+      desc:'台北最知名地標，89樓戶外觀景台俯瞰台北盆地360°全景，夜景尤為壯觀。提前線上購票可避免現場排隊，週末需特別提早。',
+      price:'NT$600', duration:'彈性', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'attraction', icon:'🚡', badge:'貓空特色', name:'貓空纜車 + 茶園體驗', region:'台北',
+      desc:'搭乘台北唯一的空中纜車，俯瞰大台北地區，終點貓空是台北最重要的茶葉產區。喝一杯鐵觀音茶、賞山城夜景，是最台灣的午後消遣。',
+      price:'NT$250起', duration:'約半天', link:'https://www.klook.com/zh-TW/taiwan/' },
+    { cat:'attraction', icon:'🌙', badge:'湖光山色', name:'日月潭搭船 + 纜車套票', region:'南投',
+      desc:'搭環湖遊艇繞湖一圈，造訪玄光寺、伊達邵碼頭，再搭纜車從空中俯瞰日月潭全景，是南投最完整的日月潭體驗組合。',
+      price:'NT$560起', duration:'半天~全天', link:'https://www.klook.com/zh-TW/taiwan/' },
+];
 
-        // 台灣行程資料庫
-        const itineraryData = {
-            '台灣': {
-                '門票': [
-                {
-                    title: '台灣通行證 Visit Taiwan Pass',
-                    description: '一張卡暢遊台灣！包含免費進入台灣X the Sky、樂天世界、松島海上纜車等超過30個熱門景點，並可作為交通卡使用，是自由行旅客的首選。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234062&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F81576-visit-busan-pass%2F'
-                },
-                {
-                    title: '海雲台藍線公園 海岸列車 / 天空膠囊列車 車票',
-                    description: '台灣最夯打卡景點！復古造型的天空膠囊列車沿著海岸線行駛，讓您將海雲台的無敵海景盡收眼底。強烈建議提早預約時段！',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234064&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F133293-haeundae-blueline-park-ticket-in-busan%2F'
-                },
-                {
-                    title: '台灣 X the Sky 觀景台門票',
-                    description: '位於台灣第二高樓海雲台 LCT 內，從100樓高空360度俯瞰海雲台沙灘、廣安大橋與台灣市景。透明玻璃步道絕對考驗您的膽量。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234065&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F81280-busan-haeundae-lct-x-the-sky-admission-ticket%2F'
-                },
-                {
-                    title: '台灣樂天世界冒險樂園',
-                    description: '台灣最新大型主題樂園！以「童話王國」為主題，擁有多項刺激的雲霄飛車、適合親子的遊樂設施，以及精彩的花車遊行表演。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234066&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F75094-lotte-world-busan%2F'
-                },
-                {
-                    title: '松島海上纜車門票',
-                    description: '享受驚險刺激的松島海上纜車之旅，飽覽南港大橋等美景',
-                    link: 'https://www.klook.com/zh-TW/activity/29068-busan-air-cruise-cable-car-ticket/'
-                }
-                ],
-                '一日遊': [
-                {
-                    title: '台灣精華景點一日遊（海東龍宮寺、松島）',
-                    description: '輕鬆玩台灣！走訪建於海邊的絕美寺廟「海東龍宮寺」、松島。',
-                    link: 'https://www.klook.com/zh-TW/activity/13011-skywalk-haedong-yonggungsa-temple-tour-busan/?spm=SearchResult.SearchResult_LIST&clickId=7eb6cf62cd'
-                },
-                {
-                    title: '甘川洞文化村、海雲台藍線一日遊',
-                    description: '海濱列車 & 天空艙： 從獨特的視角體驗台灣迷人東海岸的壯麗景色',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234068&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F74132-busan-oneday-tour-busan%2F'
-                },
-                {
-                    title: '台灣天空步道與東海岸探索半日/一日遊',
-                    description: '體驗五六島天空步道的刺激，沿著海岸線散步，感受台灣特有的海岸線魅力，輕鬆遊覽各大景點。',
-                    link: 'https://www.klook.com/zh-TW/activity/2431-exploration-east-busan/?spm=SearchResult.SearchResult_LIST&clickId=c387deeb7c'
-                }
-                ],
-                '美食餐廳': [
-                {
-                    title: '札嘎其市場 & 富平罐頭市場當地美食 在地美食半日遊',
-                    description: '跟隨專業在地導遊深入札嘎其市場 & 富平罐頭市場當地美食！品嚐台灣道地街頭小吃與美食，同時了解台灣深厚的歷史與飲食文化。',
-                    link: 'https://www.klook.com/zh-TW/activity/172716-jagalchi-market-bupyeong-kkangtong-market-half-day-local-food-small-group-tour/?spm=SearchResult.SearchResult_LIST&clickId=87d9d1f6a4'
-                }
-                ],
-                '汗蒸幕與體驗': [
-                {
-                    title: '新世界 Spa Land 汗蒸幕入場券 (Centum City)',
-                    description: '號稱台灣最豪華的五星級汗蒸幕！提供來自地下湧泉的天然溫泉水、多種主題的熱療室（黃土房、木炭房等），是逛街後放鬆的完美去處。',
-                    link: 'https://www.klook.com/zh-TW/activity/33180-spa-land-centum-city-ticket-busan/?spm=SearchResult.SearchResult_LIST&clickId=2340a4db88'
-                },
-                {
-                    title: '海雲台 ClubD Oasis 水上樂園 & 汗蒸幕',
-                    description: '結合高端汗蒸幕與無邊際海景水上樂園的全新複合設施。可以在戶外溫泉池一邊泡湯一邊欣賞海雲台絕美海景。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115196&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F89874-club-d-oasis-busan%2F'
-                },
-                {
-                    title: '甘川洞文化村 韓服/校服租借體驗',
-                    description: '穿上傳統韓服或復古台灣高中校服，穿梭在充滿彩色階梯與可愛壁畫的甘川洞小巷中，與小王子雕像留下難忘的合影。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1233989&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F94949-gamcheon-hanbok-rental%2F'
-                }
-                ],
-                '交通及網路': [
-                {
-                    title: '台灣 4G / 5G 上網 eSIM (即買即用)',
-                    description: '免換實體卡，掃描 QR code 即可上網！提供 SKT / KT 等大型電信商網路，訊號穩定，吃到飽不降速方案可選。',
-                    link: 'https://www.klook.com/zh-TW/activity/100060-4g-esim-korea/?spm=SearchResult.SearchResult_LIST&clickId=a0b01c0b41'
-                },
-                {
-                    title: '金海國際機場 (PUS) 往返台灣市區 接送服務',
-                    description: '免去提著大件行李擠地鐵的煩惱！提供專車接機/送機服務，直達海雲台、西面或南浦洞的飯店，安全又舒適。',
-                    link: 'https://www.klook.com/zh-TW/airport-transfers/'
-                },
-                {
-                    title: '台灣鐵道周遊券 Korail Pass (KR PASS)',
-                    description: '若您計畫從首爾搭乘 KTX 前往台灣，KR Pass 絕對是省錢必備！可於期限內無限次搭乘台灣火車與高鐵。',
-                    link: 'https://www.klook.com/zh-TW/activity/2847-korea-rail-pass-seoul/?spm=SearchResult.SearchResult_LIST&clickId=78e6f93444'
-                },
-                {
-                    title: '台灣金海國際機場 (PUS) - 台灣市區接駁巴士',
-                    description: '經濟實惠的點對點接送服務 以最划算的價格，舒適地前往目的地，是計程車以外的超值選擇。',
-                    link: 'https://www.klook.com/zh-TW/activity/192772-gimhae-international-airport-pus-busan-city-shuttle-bus/?spm=SearchResult.SearchResult_LIST&clickId=f116e15797'
-                },
-                {
-                    title: '台灣 - 福岡 新山茶花號渡輪',
-                    description: '乘坐New Camellia Line，體驗從福岡到台灣的舒適跨境航行',
-                    link: 'https://www.klook.com/zh-TW/activity/92564-camellia-line-fukuoka-busan/?spm=SearchResult.SearchResult_LIST&clickId=de544a0a60'
-                }
-                ]
-            },
-            '慶州': {
-                '一日遊': [
-                {
-                    title: '(台灣出發) 慶州歷史遺址一日遊：佛國寺、大陵苑、皇理團路',
-                    description: '踏入台灣的「無屋頂博物館」！參觀世界文化遺產佛國寺、欣賞大陵苑的壯觀古墓群，並在充滿韓屋氛圍的皇理團路品嚐特色小吃。',
-                    link: 'https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234091&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Factivity%2F161323-gyeongju-unesco-legacy-1-day-tour-from-busan%2F'
-                },
-                {
-                    title: '(台灣出發) 慶州文化遺產與夜景精華一日遊',
-                    description: '特別安排傍晚至晚間的行程，帶您欣賞慶州最著名的夜景！倒映在水面上的東宮與月池以及燈光璀璨的月精橋，美不勝收。',
-                    link: 'https://www.klook.com/zh-TW/activity/74147-gyeongju-oneday-tour-gyeongju/?spm=SearchResult.SearchResult_LIST&clickId=489e8e61b9'
-                }
-                ],
-                '門票': [
-                {
-                    title: '慶州世界主題樂園 (Gyeongju World) 門票',
-                    description: '台灣南部最大主題樂園！擁有台灣唯一呈90度垂直俯衝的極限雲霄飛車「Draken」，喜歡刺激體驗的旅客絕對不能錯過。',
-                    link: 'https://www.klook.com/zh-TW/activity/51533-gyeongju-world-gyeongju/?spm=SearchResult.SearchResult_LIST&clickId=4d2c1b8f02'
-                }
-                ],
-                '交通及網路': [
-                {
-                    title: '台灣 4G / 5G 上網 eSIM',
-                    description: '覆蓋全台灣的穩定網路，讓您在慶州查地圖、發限動都暢通無阻。',
-                    link: 'https://www.klook.com/zh-TW/activity/100060-4g-esim-korea/?spm=SearchResult.SearchResult_LIST&clickId=a0b01c0b41'
-                }
-                ]
-            },
-            '大邱': {
-                '一日遊': [
-                {
-                    title: '(大邱出發) 大邱熱門景點一日遊：八公山、金光石路',
-                    description: '輕鬆搭乘專車前往大邱！搭乘八公山纜車欣賞絕美山景，漫步於充滿文藝氣息的金光石路，感受不同於台灣的城市氛圍。',
-                    link: 'https://www.klook.com/zh-TW/activity/194467-daegu-one-day-tour-palgongsan-cable-car-e-world-night-view/?spm=SearchResult.SearchResult_LIST&clickId=2e1bcfe467'
-                }
-                ],
-                '門票': [
-                {
-                    title: '大邱 E-World 主題樂園 ＆ 83塔門票',
-                    description: '大邱最具代表性的遊樂園！不僅有豐富的遊樂設施，春季更是台灣著名的賞櫻勝地。傍晚可登上83塔俯瞰大邱浪漫市景。',
-                    link: 'https://www.klook.com/zh-TW/activity/134856-daegu-e-world-ticket/?spm=SearchResult.SearchResult_LIST&clickId=24bcdbd222'
-                }
-                ],
-                '交通及網路': [
-                {
-                    title: '台灣 4G / 5G 上網 eSIM',
-                    description: '覆蓋全台灣的穩定網路，讓您在大邱查地圖、發限動都暢通無阻。',
-                    link: 'https://www.klook.com/zh-TW/activity/100060-4g-esim-korea/?spm=SearchResult.SearchResult_LIST&clickId=a0b01c0b41'
-                }
-                ]
-            }
-        };
+function filterTrip(cat, btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const items = cat==='all' ? TRIPS : TRIPS.filter(t=>t.cat===cat);
+    renderTrips(items);
+}
 
-        function App() {
-            const [selectedRegion, setSelectedRegion] = useState('台灣');
-            const [selectedCategory, setSelectedCategory] = useState('門票');
-
-            // 取得當前選定地區與分類的資料
-            const currentData = itineraryData[selectedRegion]?.[selectedCategory] || [];
-
-            return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
-                    {/* 頂部導覽列：改為海洋藍色系以符合台灣意象 */}
-                    <header className="bg-white shadow-sm sticky top-0 z-10">
-                        <div className="max-w-5xl mx-auto px-4 py-4 md:py-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <MapPin className="text-blue-600 w-6 h-6 md:w-8 md:h-8" />
-                                <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
-                                台灣及周邊行程探索指南
-                                </h1>
-                            </div>
-                            
-                            {/* 地區選擇按鈕 */}
-                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                                {/* 回到首頁按鈕 */}
-                                <a
-                                    href="https://linkuei0425.github.io/Taiwan/index.html"
-                                    className="flex items-center gap-1.5 whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
-                                >
-                                    <Home className="w-4 h-4" />
-                                    回到首頁
-                                </a>
-
-                                {REGIONS.map((region) => (
-                                    <button
-                                        key={region}
-                                        onClick={() => {
-                                            setSelectedRegion(region);
-                                            // 判斷該地區可用的分類，若目前選擇的分類不在其中，則自動切換至第一個可用分類
-                                            const allowed = getAvailableCategoryIds(region);
-                                            if (!allowed.includes(selectedCategory)) {
-                                                setSelectedCategory(allowed[0]);
-                                            }
-                                        }}
-                                        className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                                            selectedRegion === region
-                                            ? 'bg-slate-800 text-white shadow-md'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                        }`}
-                                    >
-                                        {region}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </header>
-
-                    <main className="max-w-5xl mx-auto px-4 py-6">
-                        {/* 分類標籤 */}
-                        <div className="flex flex-wrap gap-2 md:gap-3 mb-8">
-                            {CATEGORIES.filter(cat => getAvailableCategoryIds(selectedRegion).includes(cat.id)).map(({ id, icon: Icon }) => (
-                                <button
-                                    key={id}
-                                    onClick={() => setSelectedCategory(id)}
-                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-                                        selectedCategory === id
-                                        ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
-                                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                                    }`}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    {id}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* 內容區域標題 */}
-                        <div className="mb-6">
-                            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                {selectedRegion} - {selectedCategory} 精選推薦
-                            </h2>
-                        </div>
-
-                        {/* 項目列表 */}
-                        {currentData.length > 0 ? (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                                {currentData.map((item, index) => (
-                                    <div 
-                                        key={index} 
-                                        className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 md:p-6 flex flex-col justify-between hover:shadow-md transition-shadow"
-                                    >
-                                        <div>
-                                            <h3 className="text-lg md:text-xl font-bold text-slate-800 mb-3 leading-tight">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-slate-600 text-sm md:text-base mb-6 leading-relaxed">
-                                                {item.description}
-                                            </p>
-                                        </div>
-                                        
-                                        {/* 詳細說明連結按鈕 */}
-                                        <div className="mt-auto pt-4 border-t border-slate-50 flex justify-end">
-                                            <a
-                                                href={item.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors w-full sm:w-auto"
-                                            >
-                                                <Info className="w-4 h-4" />
-                                                <span>詳細說明</span>
-                                                <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            /* 無資料時的空狀態提示 */
-                            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center flex flex-col items-center justify-center">
-                                <div className="bg-slate-50 p-4 rounded-full mb-4">
-                                    <Sparkles className="w-8 h-8 text-slate-400" />
-                                </div>
-                                <h3 className="text-lg font-medium text-slate-700 mb-2">
-                                    目前 {selectedRegion} 尚未新增「{selectedCategory}」的推薦項目
-                                </h3>
-                                <p className="text-slate-500">
-                                    我們正在為您整理最優質的行程資料，敬請期待！
-                                </p>
-                            </div>
-                        )}
-
-                        {/* 探索更多 Klook 台灣行程按鈕 (全局顯示) */}
-                        <div className="mt-10 flex justify-center">
-                            <a 
-                                href="https://affiliate.klook.com/redirect?aid=115300&aff_adid=1234096&k_site=https%3A%2F%2Fwww.klook.com%2Fzh-TW%2Fsearch%2Fresult%2F%3Fquery%3D%25E9%2587%259C%25E5%25B1%25B1" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                            >
-                                <Sparkles className="w-5 h-5" />
-                                <span className="tracking-wide">前往 Klook 探索更多台灣行程</span>
-                                <ExternalLink className="w-5 h-5 ml-1 opacity-90" />
-                            </a>
-                        </div>
-                    </main>
+function renderTrips(items){
+    document.getElementById('trip-grid').innerHTML = items.map(t=>`
+        <div class="trip-card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col">
+            <div class="flex items-start gap-3 mb-3">
+                <span class="text-4xl">${t.icon}</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="font-bold text-gray-800 text-base leading-tight">${t.name}</h3>
+                        ${t.badge?`<span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">${t.badge}</span>`:''}
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">📍 ${t.region}</p>
                 </div>
-            );
-        }
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4 flex-1">${t.desc}</p>
+            <div class="flex gap-2 flex-wrap text-xs mb-4">
+                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">💰 ${t.price}</span>
+                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">⏱️ ${t.duration}</span>
+            </div>
+            <a href="${t.link}" target="_blank" rel="noopener"
+               class="w-full text-center bg-gradient-to-r from-orange-500 to-amber-400 hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl transition-opacity text-sm">
+                🎟️ 前往 Klook 查看詳情
+            </a>
+        </div>`).join('');
+}
 
-        // 渲染 React 應用程式到 DOM
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+renderTrips(TRIPS);
+</script>
 </body>
 </html>

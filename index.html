@@ -1,6 +1,5 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -9,881 +8,1228 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            box-sizing: border-box
-        }
+        * { box-sizing: border-box }
+        body { font-family: 'Outfit', 'Noto Sans TC', sans-serif; background: #f1f5f9; color: #1e293b; margin: 0 }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-            margin: 0
-        }
-
-        /* Layout */
+        /* ─── Sidebar ─── */
         .sidebar {
-            width: 260px;
-            min-height: 100vh;
+            width: 260px; min-height: 100vh;
             background: linear-gradient(160deg, #059669, #0284c7);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-            padding: 24px 16px
+            position: fixed; left: 0; top: 0; z-index: 40;
+            display: flex; flex-direction: column; padding: 24px 16px;
         }
-
-        .main-area {
-            margin-left: 260px;
-            min-height: 100vh
-        }
+        .main-area { margin-left: 260px; min-height: 100vh; }
 
         @media(max-width:900px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: .3s
-            }
-
-            .sidebar.open {
-                transform: translateX(0)
-            }
-
-            .main-area {
-                margin-left: 0
-            }
-
-            .mobile-header {
-                display: flex !important
-            }
+            .sidebar { transform: translateX(-100%); transition: .3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-area { margin-left: 0; padding-bottom: 72px; }
+            .mobile-header { display: flex !important; }
+            .bottom-nav { display: flex !important; }
         }
-
         .mobile-header {
-            display: none;
-            position: sticky;
-            top: 0;
-            z-index: 30;
+            display: none; position: sticky; top: 0; z-index: 30;
             background: linear-gradient(135deg, #059669, #0284c7);
-            color: #fff;
-            padding: 14px 16px;
-            align-items: center;
-            gap: 12px
+            color: #fff; padding: 14px 16px; align-items: center; gap: 12px;
         }
+        .bottom-nav {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            background: #fff; border-top: 1px solid #e2e8f0;
+            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            justify-content: space-around; align-items: center;
+            box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+        }
+        .bnav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 4px 12px; border-radius: 12px; cursor: pointer;
+            font-size: 10px; font-weight: 700; color: #94a3b8; transition: .2s;
+            background: none; border: none; min-width: 56px;
+        }
+        .bnav-item.active { color: #059669; }
+        .bnav-item .bnav-icon { font-size: 22px; line-height: 1; }
 
-        /* Sidebar nav items */
+        /* ─── Nav Links ─── */
         .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: .2s;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px
+            display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+            border-radius: 16px; cursor: pointer; transition: .2s;
+            color: rgba(255,255,255,0.8); font-weight: 600; font-size: 14px; margin-bottom: 3px;
         }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.2); color: #fff; }
 
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff
-        }
+        /* ─── Panels ─── */
+        .panel { display: none; }
+        .panel.active { display: block; }
 
-        .nav-link i {
-            font-size: 20px;
-            width: 24px;
-            text-align: center
-        }
-
-        /* Content panels */
-        .panel {
-            display: none
-        }
-
-        .panel.active {
-            display: block
-        }
-
-        /* Swiper */
-        .swiper {
-            width: 100%;
-            padding: 20px 0 40px
-        }
-
+        /* ─── Swiper ─── */
+        .swiper { width: 100%; padding: 20px 0 40px; }
         .swiper-slide {
-            width: 280px;
-            height: 400px;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-            position: relative;
-            cursor: pointer
+            width: 280px; height: 380px; border-radius: 28px;
+            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,.12);
+            position: relative; cursor: pointer;
         }
 
-        /* Cards */
+        /* ─── Cards ─── */
         .card {
-            background: #fff;
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f1f5f9;
-            transition: .2s
+            background: #fff; border-radius: 20px; padding: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.04); border: 1px solid #f1f5f9; transition: .2s;
         }
+        .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.08); transform: translateY(-2px); }
 
-        .card:hover {
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px)
-        }
-
-        /* Chips */
+        /* ─── Chips ─── */
         .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: .2s
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 100px; font-size: 13px;
+            font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: .2s;
         }
+        .chip.active { border-color: currentColor; }
 
-        .chip.active {
-            border-color: currentColor
-        }
-
-        /* Modal */
+        /* ─── Modal ─── */
         #modal-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            align-items: flex-end;
-            justify-content: center
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+            z-index: 100; align-items: flex-end; justify-content: center;
         }
-
-        #modal-backdrop.open {
-            display: flex
-        }
-
+        #modal-backdrop.open { display: flex; }
         #modal-box {
-            background: #fff;
-            width: 100%;
-            max-width: 640px;
-            border-radius: 40px 40px 0 0;
-            max-height: 88vh;
-            overflow-y: auto;
-            padding: 32px;
-            transform: translateY(100%);
-            transition: .4s cubic-bezier(.25, .8, .25, 1)
+            background: #fff; width: 100%; max-width: 640px;
+            border-radius: 36px 36px 0 0; max-height: 88vh; overflow-y: auto;
+            padding: 32px; transform: translateY(100%); transition: .4s cubic-bezier(.25,.8,.25,1);
         }
+        #modal-backdrop.open #modal-box { transform: translateY(0); }
 
-        #modal-backdrop.open #modal-box {
-            transform: translateY(0)
-        }
-
-        /* MRT */
+        /* ─── MRT select ─── */
         select.tw-select {
-            width: 100%;
-            padding: 14px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            outline: none
+            width: 100%; padding: 14px;
+            background: #f8fafc; border: 2px solid #e2e8f0;
+            border-radius: 16px; font-family: 'Outfit', sans-serif;
+            font-weight: 600; font-size: 14px; outline: none;
         }
-
-        select.tw-select:focus {
-            border-color: #059669
-        }
-
+        select.tw-select:focus { border-color: #059669; }
         .result-box {
             background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-            border: 1px solid #a7f3d0;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            animation: fadeIn .4s ease
+            border: 1px solid #a7f3d0; border-radius: 20px;
+            padding: 20px; text-align: center;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        /* Grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 16px
-        }
-
+        /* ─── Feature Grid ─── */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 14px; }
         .feat-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: .2s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f1f5f9
+            background: #fff; border-radius: 20px; padding: 20px; text-align: center;
+            cursor: pointer; transition: .2s; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+            border: 1px solid #f1f5f9;
         }
-
-        .feat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08)
-        }
-
+        .feat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
         .feat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #fff;
-            margin: 0 auto 12px
+            width: 52px; height: 52px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #fff; margin: 0 auto 10px;
         }
 
-        /* Checklist */
+        /* ─── Checklist ─── */
         .check-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            background: #f8fafc;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: .2s;
-            user-select: none
+            display: flex; align-items: center; gap: 12px; padding: 14px;
+            background: #f8fafc; border-radius: 16px; cursor: pointer; transition: .2s; user-select: none;
         }
-
-        .check-row:hover {
-            background: #f1f5f9
-        }
-
-        .check-row.done .check-label {
-            text-decoration: line-through;
-            opacity: .5
-        }
-
+        .check-row:hover { background: #f1f5f9; }
+        .check-row.done .check-label { text-decoration: line-through; opacity: .5; }
         .check-circle {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: .2s
+            width: 26px; height: 26px; border-radius: 50%; border: 2px solid #cbd5e1;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: .2s;
         }
+        .check-row.done .check-circle { background: #059669; border-color: #059669; color: #fff; }
 
-        .check-row.done .check-circle {
-            background: #059669;
-            border-color: #059669;
-            color: #fff
-        }
+        /* ─── Badge ─── */
+        .badge { padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
 
-        /* Tag badges */
-        .badge {
-            padding: 3px 10px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .05em
-        }
+        /* ─── Day line ─── */
+        .day-line { border-left: 4px solid; padding-left: 20px; margin-bottom: 24px; }
 
-        /* Itin timeline */
-        .day-line {
-            border-left: 4px solid;
-            padding-left: 20px;
-            margin-bottom: 24px
+        /* ─── Attraction / Food Card Grid ─── */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        @media(max-width:640px) { .card-grid { grid-template-columns: 1fr; } }
+
+        /* ─── Section header ─── */
+        .section-head {
+            padding: 36px 32px 24px; background: #fff; border-bottom: 1px solid #f1f5f9;
         }
+        .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
+        .section-title { font-size: 26px; font-weight: 800; margin: 6px 0 4px; }
+        .section-sub { color: #64748b; font-size: 14px; }
+        .section-body { padding: 28px 32px 40px; max-width: 900px; }
+        @media(max-width:640px) { .section-head { padding: 24px 16px 16px; } .section-body { padding: 16px 16px 40px; } }
+
+        /* ─── Info tag ─── */
+        .info-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 700;
+            padding: 4px 10px; border-radius: 8px;
+        }
+        .klook-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #ff6b35, #f59e0b);
+            color: #fff; font-weight: 800; font-size: 13px;
+            padding: 10px 18px; border-radius: 14px; text-decoration: none; transition: .2s;
+            border: none; cursor: pointer;
+        }
+        .klook-btn:hover { opacity: .9; transform: translateY(-1px); }
     </style>
 </head>
-
 <body>
-    <!-- Mobile Top Bar -->
-    <div class="mobile-header">
-        <button onclick="toggleSidebar()" class="text-white text-2xl">☰</button>
-        <div>
-            <div style="font-size:11px;opacity:.7;font-weight:700">TAIPEI · <span id="m-clock">00:00</span></div>
-            <div style="font-size:20px;font-weight:800">探索台灣</div>
-        </div>
-        <div
-            style="margin-left:auto;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700">
-            27°C ☀️</div>
+
+<!-- ═══ MOBILE TOP BAR ═══ -->
+<div class="mobile-header">
+    <button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer">☰</button>
+    <div>
+        <div style="font-size:10px;opacity:.7;font-weight:700">TAIPEI · <span id="m-clock">00:00</span></div>
+        <div style="font-size:20px;font-weight:800">探索台灣</div>
     </div>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div style="color:#fff;margin-bottom:32px;padding:8px 8px 0">
-            <div style="font-size:11px;opacity:.7;font-weight:700;letter-spacing:.15em">TAIPEI · <span
-                    id="s-clock">00:00</span></div>
-            <div style="font-size:28px;font-weight:800;line-height:1.1;margin-top:4px">探索台灣</div>
-            <div style="font-size:12px;opacity:.7;margin-top:4px">Explore Taiwan</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:12px;margin-bottom:24px;color:#fff">
-            <div style="font-size:11px;opacity:.7;font-weight:700">台北天氣</div>
-            <div style="font-size:24px;font-weight:800">27°C ☀️ 晴朗</div>
-            <div style="font-size:11px;opacity:.7">體感溫度 29°C</div>
-        </div>
-        <nav style="flex:1">
-            <div class="nav-link active" onclick="showPanel('home',this)" id="nav-home">🏠 <span>首頁總覽</span></div>
-            <div class="nav-link" onclick="showPanel('mrt',this)">🚆 <span>捷運規劃</span></div>
-            <div class="nav-link" onclick="showPanel('airport',this)">✈️ <span>機場攻略</span></div>
-            <div class="nav-link" onclick="location.href='food.html'">🍜 <span>美食探索</span></div>
-            <div class="nav-link" onclick="showPanel('itin',this)">📅 <span>推薦行程</span></div>
-            <div class="nav-link" onclick="showPanel('checklist',this)">✅ <span>旅行清單</span></div>
-            <div class="nav-link" onclick="showPanel('tips',this)">💡 <span>台灣小知識</span></div>
-        </nav>
-        <div style="color:rgba(255,255,255,0.5);font-size:11px;text-align:center;margin-top:16px">© 2025 探索台灣</div>
+    <div style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700" id="m-weather">
+        ☀️ 載入中...
     </div>
+</div>
 
-    <!-- Main Area -->
-    <div class="main-area" id="main">
-
-        <!-- HOME PANEL -->
-        <div class="panel active" id="panel-home">
-            <div
-                style="background:linear-gradient(135deg,#059669,#0284c7);padding:40px 32px 60px;position:relative;overflow:hidden">
-                <div style="max-width:600px">
-                    <div style="color:rgba(255,255,255,0.7);font-weight:700;font-size:12px;letter-spacing:.15em">EXPLORE
-                        TAIWAN 探索台灣</div>
-                    <h1 style="color:#fff;font-size:clamp(28px,4vw,42px);font-weight:800;margin:8px 0;line-height:1.2">
-                        台灣，一座擁有<br>無限驚喜的島嶼</h1>
-                </div>
-            </div>
-            <!-- Carousel -->
-            <div style="padding:0 24px;margin-top:-32px">
-                <div class="swiper main-swiper">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide" onclick="showAttractionDetail('taipei101')">
-                            <img src="taipei101.png" style="width:100%;height:100%;object-fit:cover">
-                            <div
-                                style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent)">
-                            </div>
-                            <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
-                                <span class="badge" style="background:#ef4444">Must Visit</span>
-                                <div style="font-size:22px;font-weight:800;margin-top:8px">台北 101</div>
-                                <div style="font-size:12px;opacity:.8">Taipei 101 · 508m 世界第二高樓</div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" onclick="showAttractionDetail('taroko')">
-                            <img src="taroko.png" style="width:100%;height:100%;object-fit:cover">
-                            <div
-                                style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent)">
-                            </div>
-                            <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
-                                <span class="badge" style="background:#10b981">Nature</span>
-                                <div style="font-size:22px;font-weight:800;margin-top:8px">太魯閣國家公園</div>
-                                <div style="font-size:12px;opacity:.8">Taroko Gorge · 花蓮縣</div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" onclick="showAttractionDetail('jiufen')">
-                            <img src="jiufen.png" style="width:100%;height:100%;object-fit:cover">
-                            <div
-                                style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent)">
-                            </div>
-                            <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
-                                <span class="badge" style="background:#f59e0b">Culture</span>
-                                <div style="font-size:22px;font-weight:800;margin-top:8px">九份老街</div>
-                                <div style="font-size:12px;opacity:.8">Jiufen Old Street · 新北市</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-            <!-- Quick Features -->
-            <div style="padding:0 24px 40px">
-                <div style="font-size:18px;font-weight:800;margin-bottom:16px">快速入口</div>
-                <div class="feature-grid">
-                    <div class="feat-card" onclick="showPanel('mrt',document.querySelector('.nav-link:nth-child(2)'))">
-                        <div class="feat-icon" style="background:#059669">🚆</div>
-                        <div style="font-weight:800;font-size:13px">捷運規劃</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">智能路徑計算</div>
-                    </div>
-                    <div class="feat-card"
-                        onclick="showPanel('airport',document.querySelector('.nav-link:nth-child(3)'))">
-                        <div class="feat-icon" style="background:#0284c7">✈️</div>
-                        <div style="font-weight:800;font-size:13px">機場攻略</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">TPE/TSA/KHH</div>
-                    </div>
-                    <div class="feat-card" onclick="location.href='food.html'">
-                        <div class="feat-icon" style="background:#ef4444">🍜</div>
-                        <div style="font-weight:800;font-size:13px">美食探索</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">100+ 道地美食</div>
-                    </div>
-                    <div class="feat-card" onclick="showPanel('itin',document.querySelector('.nav-link:nth-child(5)'))">
-                        <div class="feat-icon" style="background:#f59e0b">📅</div>
-                        <div style="font-weight:800;font-size:13px">推薦行程</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">3天2夜精選</div>
-                    </div>
-                    <div class="feat-card"
-                        onclick="showPanel('checklist',document.querySelector('.nav-link:nth-child(6)'))">
-                        <div class="feat-icon" style="background:#1e293b">✅</div>
-                        <div style="font-weight:800;font-size:13px">旅行清單</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">出發前必備</div>
-                    </div>
-                    <div class="feat-card" onclick="showPanel('tips',document.querySelector('.nav-link:nth-child(7)'))">
-                        <div class="feat-icon" style="background:#8b5cf6">💡</div>
-                        <div style="font-weight:800;font-size:13px">台灣小知識</div>
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px">旅行必懂須知</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MRT PANEL -->
-        <div class="panel" id="panel-mrt">
-            <div style="padding:40px 32px 24px;background:#fff;border-bottom:1px solid #f1f5f9">
-                <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.1em">
-                    Smart Route</div>
-                <h2 style="font-size:28px;font-weight:800;margin:6px 0">台北捷運智能規劃</h2>
-                <p style="color:#64748b;font-size:14px">選擇起點與終點，系統自動推薦最佳路線</p>
-            </div>
-            <div style="padding:32px;max-width:700px">
-                <div class="card" style="margin-bottom:20px">
-                    <div style="display:grid;gap:16px">
-                        <div>
-                            <label
-                                style="font-size:11px;font-weight:800;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase">🔵
-                                起點站 Origin</label>
-                            <select class="tw-select" id="mrt-from" style="margin-top:8px">
-                                <option value="">選擇起點...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label
-                                style="font-size:11px;font-weight:800;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase">🔴
-                                終點站 Destination</label>
-                            <select class="tw-select" id="mrt-to" style="margin-top:8px">
-                                <option value="">選擇終點...</option>
-                            </select>
-                        </div>
-                        <button onclick="calcMrt()"
-                            style="background:#059669;color:#fff;border:none;padding:16px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer;transition:.2s"
-                            onmouseover="this.style.background='#047857'"
-                            onmouseout="this.style.background='#059669'">計算最佳路線 →</button>
-                    </div>
-                </div>
-                <div id="mrt-result" style="display:none">
-                    <div class="result-box">
-                        <div style="font-size:12px;font-weight:700;color:#065f46;letter-spacing:.1em">預估乘車時間</div>
-                        <div style="font-size:48px;font-weight:800;color:#059669;margin:8px 0" id="mrt-time">--</div>
-                        <div style="font-size:13px;color:#6ee7b7" id="mrt-detail">分鐘</div>
-                    </div>
-                </div>
-                <!-- Line Info -->
-                <div style="margin-top:24px">
-                    <div style="font-size:14px;font-weight:800;margin-bottom:16px;color:#1e293b">各路線重要站點</div>
-                    <div id="line-info"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AIRPORT PANEL -->
-        <div class="panel" id="panel-airport">
-            <div style="padding:40px 32px 24px;background:#fff;border-bottom:1px solid #f1f5f9">
-                <div style="font-size:12px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.1em">
-                    Transport Guide</div>
-                <h2 style="font-size:28px;font-weight:800;margin:6px 0">機場進出攻略</h2>
-                <p style="color:#64748b;font-size:14px">三大機場全方位交通指南</p>
-            </div>
-            <div style="padding:32px;max-width:800px">
-                <!-- Tabs -->
-                <div style="display:flex;gap:8px;margin-bottom:24px" id="airport-tabs">
-                    <button class="chip active" style="background:#eff6ff;color:#3b82f6"
-                        onclick="switchAirport('tpe',this)">✈️ 桃園 TPE</button>
-                    <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchAirport('tsa',this)">🏢
-                        松山 TSA</button>
-                    <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchAirport('khh',this)">🌺
-                        高雄 KHH</button>
-                </div>
-                <div id="airport-content"></div>
-            </div>
-        </div>
-
-        <!-- ITINERARY PANEL -->
-        <div class="panel" id="panel-itin">
-            <div style="padding:40px 32px 24px;background:#fff;border-bottom:1px solid #f1f5f9">
-                <div style="font-size:12px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.1em">
-                    Travel Plan</div>
-                <h2 style="font-size:28px;font-weight:800;margin:6px 0">精心規劃行程</h2>
-                <p style="color:#64748b;font-size:14px">多種主題行程，讓你玩遍台灣精華</p>
-            </div>
-            <div style="padding:32px;max-width:800px">
-                <!-- Plan selector -->
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px" id="itin-tabs">
-                    <button class="chip active" style="background:#fef3c7;color:#d97706"
-                        onclick="switchItin('classic',this)">❤️ 台北精華3天</button>
-                    <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchItin('north',this)">🏔️
-                        北台灣5天</button>
-                    <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchItin('south',this)">🌺
-                        南台灣4天</button>
-                </div>
-                <div id="itin-content"></div>
-            </div>
-        </div>
-
-        <!-- CHECKLIST PANEL -->
-        <div class="panel" id="panel-checklist">
-            <div style="padding:40px 32px 24px;background:#fff;border-bottom:1px solid #f1f5f9">
-                <div style="font-size:12px;font-weight:700;color:#1e293b;text-transform:uppercase;letter-spacing:.1em">
-                    Must-Have</div>
-                <h2 style="font-size:28px;font-weight:800;margin:6px 0">旅行全準備清單</h2>
-                <p style="color:#64748b;font-size:14px">點擊勾選，確保萬無一失</p>
-            </div>
-            <div style="padding:32px;max-width:700px">
-                <div id="checklist-container" style="display:grid;gap:12px"></div>
-                <button onclick="resetChecklist()"
-                    style="margin-top:24px;background:#f1f5f9;color:#64748b;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer">重置清單</button>
-            </div>
-        </div>
-
-        <!-- TIPS PANEL -->
-        <div class="panel" id="panel-tips">
-            <div style="padding:40px 32px 24px;background:#fff;border-bottom:1px solid #f1f5f9">
-                <div style="font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:.1em">
-                    Taiwan 101</div>
-                <h2 style="font-size:28px;font-weight:800;margin:6px 0">台灣旅遊小知識</h2>
-                <p style="color:#64748b;font-size:14px">旅行前必讀，讓你更融入台灣</p>
-            </div>
-            <div style="padding:32px;max-width:800px;display:grid;gap:16px" id="tips-container"></div>
-        </div>
-
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar" id="sidebar">
+    <div style="color:#fff;margin-bottom:24px;padding:8px 8px 0">
+        <div style="font-size:10px;opacity:.7;font-weight:700;letter-spacing:.15em">TAIPEI · <span id="s-clock">00:00</span></div>
+        <div style="font-size:26px;font-weight:800;line-height:1.15;margin-top:4px">探索台灣</div>
+        <div style="font-size:12px;opacity:.7;margin-top:2px">Explore Taiwan</div>
     </div>
+    <div style="background:rgba(255,255,255,.15);border-radius:16px;padding:12px;margin-bottom:20px;color:#fff" id="s-weather-box">
+        <div style="font-size:11px;opacity:.7;font-weight:700">台北現在天氣</div>
+        <div style="font-size:22px;font-weight:800" id="s-weather-text">載入中...</div>
+        <div style="font-size:11px;opacity:.6" id="s-weather-sub">正在取得資料</div>
+    </div>
+    <nav style="flex:1;overflow-y:auto">
+        <div class="nav-link active" onclick="showPanel('home',this)">🏠 <span>首頁總覽</span></div>
+        <div class="nav-link" onclick="showPanel('sights',this)">🗺️ <span>熱門景點</span></div>
+        <div class="nav-link" onclick="showPanel('food',this)">🍜 <span>美食探索</span></div>
+        <div class="nav-link" onclick="showPanel('hotel',this)">🏨 <span>住宿推薦</span></div>
+        <div class="nav-link" onclick="showPanel('transport',this)">🚇 <span>交通指南</span></div>
+        <div class="nav-link" onclick="showPanel('shopping',this)">🛍️ <span>購物攻略</span></div>
+        <div class="nav-link" onclick="showPanel('itin',this)">📅 <span>推薦行程</span></div>
+        <div class="nav-link" onclick="showPanel('tips',this)">💡 <span>旅遊小知識</span></div>
+        <div class="nav-link" onclick="showPanel('checklist',this)">✅ <span>出發清單</span></div>
+    </nav>
+    <div style="color:rgba(255,255,255,.5);font-size:11px;text-align:center;margin-top:16px">© 2025 探索台灣</div>
+</div>
 
-    <!-- Modal for attraction detail -->
-    <div id="modal-backdrop" onclick="closeModal(event)">
-        <div id="modal-box">
-            <div id="modal-body"></div>
+<!-- ═══ MAIN AREA ═══ -->
+<div class="main-area" id="main">
+
+<!-- ──────────── HOME PANEL ──────────── -->
+<div class="panel active" id="panel-home">
+    <div style="background:linear-gradient(135deg,#059669,#0284c7);padding:40px 32px 64px;position:relative;overflow:hidden">
+        <div style="max-width:600px">
+            <div style="color:rgba(255,255,255,.7);font-weight:700;font-size:12px;letter-spacing:.15em">EXPLORE TAIWAN 探索台灣</div>
+            <h1 style="color:#fff;font-size:clamp(26px,4vw,40px);font-weight:800;margin:8px 0;line-height:1.2">台灣，一座擁有<br>無限驚喜的島嶼</h1>
+            <p style="color:rgba(255,255,255,.8);font-size:14px;margin-top:8px">山岳、海洋、夜市、古廟——所有的美好，都在這裡</p>
         </div>
     </div>
+    <!-- Carousel -->
+    <div style="padding:0 24px;margin-top:-32px">
+        <div class="swiper main-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" onclick="showAttractionDetail('taipei101')">
+                    <img src="taipei101.png" style="width:100%;height:100%;object-fit:cover">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
+                    <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
+                        <span class="badge" style="background:#ef4444">地標</span>
+                        <div style="font-size:22px;font-weight:800;margin-top:8px">台北 101</div>
+                        <div style="font-size:12px;opacity:.8">508m · 信義商圈</div>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="showAttractionDetail('taroko')">
+                    <img src="taroko.png" style="width:100%;height:100%;object-fit:cover">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
+                    <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
+                        <span class="badge" style="background:#10b981">自然</span>
+                        <div style="font-size:22px;font-weight:800;margin-top:8px">太魯閣國家公園</div>
+                        <div style="font-size:12px;opacity:.8">Taroko Gorge · 花蓮</div>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="showAttractionDetail('jiufen')">
+                    <img src="jiufen.png" style="width:100%;height:100%;object-fit:cover">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
+                    <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
+                        <span class="badge" style="background:#f59e0b">老街</span>
+                        <div style="font-size:22px;font-weight:800;margin-top:8px">九份老街</div>
+                        <div style="font-size:12px;opacity:.8">Jiufen · 新北市</div>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="showAttractionDetail('sunmoon')">
+                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#0f766e,#0284c7)"></div>
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px">🌊</div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
+                    <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
+                        <span class="badge" style="background:#0284c7">湖泊</span>
+                        <div style="font-size:22px;font-weight:800;margin-top:8px">日月潭</div>
+                        <div style="font-size:12px;opacity:.8">Sun Moon Lake · 南投</div>
+                    </div>
+                </div>
+                <div class="swiper-slide" onclick="showAttractionDetail('kenting')">
+                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#0891b2,#06b6d4)"></div>
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px">🏖️</div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
+                    <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
+                        <span class="badge" style="background:#06b6d4">海灘</span>
+                        <div style="font-size:22px;font-weight:800;margin-top:8px">墾丁國家公園</div>
+                        <div style="font-size:12px;opacity:.8">Kenting · 屏東</div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    <!-- Quick Links -->
+    <div style="padding:0 24px 40px">
+        <div style="font-size:17px;font-weight:800;margin-bottom:14px">快速入口</div>
+        <div class="feature-grid">
+            <div class="feat-card" onclick="showPanel('sights',document.querySelectorAll('.nav-link')[1])">
+                <div class="feat-icon" style="background:#059669">🗺️</div>
+                <div style="font-weight:800;font-size:13px">熱門景點</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">30+ 個精選</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('food',document.querySelectorAll('.nav-link')[2])">
+                <div class="feat-icon" style="background:#ef4444">🍜</div>
+                <div style="font-weight:800;font-size:13px">美食探索</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">夜市必吃</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('transport',document.querySelectorAll('.nav-link')[4])">
+                <div class="feat-icon" style="background:#0284c7">🚇</div>
+                <div style="font-weight:800;font-size:13px">交通指南</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">MRT+高鐵</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('hotel',document.querySelectorAll('.nav-link')[3])">
+                <div class="feat-icon" style="background:#7c3aed">🏨</div>
+                <div style="font-weight:800;font-size:13px">住宿推薦</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">各地精選</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('shopping',document.querySelectorAll('.nav-link')[5])">
+                <div class="feat-icon" style="background:#db2777">🛍️</div>
+                <div style="font-weight:800;font-size:13px">購物攻略</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">夜市伴手禮</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('itin',document.querySelectorAll('.nav-link')[6])">
+                <div class="feat-icon" style="background:#f59e0b">📅</div>
+                <div style="font-weight:800;font-size:13px">推薦行程</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">3天~7天</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('tips',document.querySelectorAll('.nav-link')[7])">
+                <div class="feat-icon" style="background:#8b5cf6">💡</div>
+                <div style="font-weight:800;font-size:13px">旅遊知識</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">必懂須知</div>
+            </div>
+            <div class="feat-card" onclick="showPanel('checklist',document.querySelectorAll('.nav-link')[8])">
+                <div class="feat-icon" style="background:#1e293b">✅</div>
+                <div style="font-weight:800;font-size:13px">出發清單</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">12 項必備</div>
+            </div>
+        </div>
+        <!-- Emergency Strip -->
+        <div style="margin-top:24px;background:#fff;border-radius:20px;padding:20px;border-left:5px solid #ef4444">
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px;color:#ef4444">🆘 緊急聯絡電話</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <span class="info-tag">🚓 警察 110</span>
+                <span class="info-tag">🚑 救護/消防 119</span>
+                <span class="info-tag">📞 旅遊服務 0800-011-765</span>
+                <span class="info-tag">🏥 1999 市民服務</span>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        // ─── DATA ───────────────────────────────────────────
-        const MRT_LINES = [
-            {
-                id: 'blue', name: '🔵 板南線 (Blue)', color: '#2563eb', stations: [
-                    { code: 'BL11', name: '西門 Ximen', note: '西門町商圈、紅樓劇場' },
-                    { code: 'BL12', name: '台北車站 Taipei Main', note: '高鐵/台鐵轉乘，地下街' },
-                    { code: 'BL15', name: '忠孝復興 Zhongxiao Fuxing', note: 'SOGO百貨、東區商圈' },
-                    { code: 'BL18', name: '市政府 City Hall', note: '信義商圈、台北101' },
-                    { code: 'BL23', name: '南港展覽館 Nangang', note: '展覽館、轉乘文湖線' },
-                ]
-            },
-            {
-                id: 'red', name: '🔴 淡水信義線 (Red)', color: '#dc2626', stations: [
-                    { code: 'R05', name: '台北101 Taipei 101', note: '台北101觀景台、世貿' },
-                    { code: 'R08', name: '中正紀念堂 CKS Hall', note: '中正紀念堂、兩廳院' },
-                    { code: 'R11', name: '中山 Zhongshan', note: '心中山線形公園、誠品' },
-                    { code: 'R16', name: '士林 Shilin', note: '士林官邸、故宮轉乘公車' },
-                    { code: 'R17', name: '劍潭 Jiantan', note: '士林夜市' },
-                    { code: 'R22', name: '北投 Beitou', note: '北投溫泉博物館' },
-                    { code: 'R28', name: '淡水 Tamsui', note: '淡水老街、漁人碼頭' },
-                ]
-            },
-            {
-                id: 'green', name: '🟢 松山新店線 (Green)', color: '#16a34a', stations: [
-                    { code: 'G13', name: '北門 Beimen', note: '大稻埕碼頭、迪化街' },
-                    { code: 'G19', name: '松山 Songshan', note: '饒河街夜市、慈祐宮' },
-                    { code: 'G01', name: '新店 Xindian', note: '碧潭吊橋' },
-                ]
-            },
-            {
-                id: 'orange', name: '🟠 中和新蘆線 (Orange)', color: '#ea580c', stations: [
-                    { code: 'O11', name: '忠孝新生 Zhongxiao', note: '轉乘板南線' },
-                    { code: 'O04', name: '大橋頭 Daqiaotou', note: '延三夜市、大稻埕歷史街' },
-                ]
-            },
-        ];
+<!-- ──────────── SIGHTS PANEL ──────────── -->
+<div class="panel" id="panel-sights">
+    <div class="section-head">
+        <div class="section-label" style="color:#059669">Attractions</div>
+        <h2 class="section-title">熱門景點</h2>
+        <p class="section-sub">依地區探索台灣最值得一去的地方</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="sights-region-tabs">
+            <button class="chip active" style="background:#ecfdf5;color:#059669" onclick="filterSights('all',this)">🌟 全部</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterSights('north',this)">🏙️ 北台灣</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterSights('central',this)">⛰️ 中台灣</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterSights('south',this)">☀️ 南台灣</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterSights('east',this)">🏔️ 東台灣</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterSights('island',this)">🏝️ 離島</button>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="card-grid" id="sights-grid"></div>
+    </div>
+</div>
 
-        const AIRPORTS = {
-            tpe: {
-                name: '桃園國際機場 (TPE)',
-                desc: '台灣最大的國際機場，位於桃園市，距離台北市約40公里。',
-                options: [
-                    { icon: '🚇', title: '機場捷運 A快車', desc: '直達車38分鐘抵達台北車站，票價160元。每15-30分一班，24小時直達班次。' },
-                    { icon: '🚌', title: '國光客運 1819', desc: '24小時營運，途經台北多站，票價約135元。最通到飯店區域的選擇。' },
-                    { icon: '🚎', title: '統聯客運 1960', desc: '到台北車站，票價125元，適合預算旅客。' },
-                    { icon: '🚕', title: '計程車/Uber', desc: '到台北市區約 NT$1100-1400，建議使用台灣大車隊 APP。' },
-                ]
-            },
-            tsa: {
-                name: '台北松山機場 (TSA)',
-                desc: '位於台北市區的城市機場，主飛日、韓及國內線。距離市中心僅10-15分鐘。',
-                options: [
-                    { icon: '🚇', title: '捷運文湖線 (棕線)', desc: '從松山機場站直接上車→南京復興→忠孝復興，約10分鐘即達市區。' },
-                    { icon: '🚌', title: '市區公車', desc: '多條公車路線，20元起，直達各市中心地點。' },
-                    { icon: '🚕', title: '計程車/Uber', desc: '到台北市區約 NT$200-350，含機場費另計。' },
-                ]
-            },
-            khh: {
-                name: '高雄國際機場 (KHH)',
-                desc: '高雄的主要機場，鄰近LRT（輕軌）與捷運，交通方便。',
-                options: [
-                    { icon: '🚇', title: '捷運橘線', desc: '機場站直接搭乘橘線，約15分鐘到市中心美麗島站。票價20-40元。' },
-                    { icon: '🚕', title: '計程車', desc: '到高雄市區約 NT$200-300。' },
-                    { icon: '🚎', title: '高雄公車', desc: '12元起步，多條路線通往旗津、六合夜市等景點。' },
-                ]
-            }
-        };
+<!-- ──────────── FOOD PANEL ──────────── -->
+<div class="panel" id="panel-food">
+    <div class="section-head">
+        <div class="section-label" style="color:#ef4444">Food & Night Markets</div>
+        <h2 class="section-title">美食探索</h2>
+        <p class="section-sub">夜市小吃、道地料理、必喝飲品</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="food-cat-tabs">
+            <button class="chip active" style="background:#fef2f2;color:#ef4444" onclick="filterFood('all',this)">🍽️ 全部</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterFood('nightmarket',this)">🌃 夜市必吃</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterFood('restaurant',this)">🏮 名店餐廳</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterFood('drink',this)">🧋 台灣飲品</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterFood('regional',this)">📍 各地特色</button>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="card-grid" id="food-grid"></div>
+    </div>
+</div>
 
-        const ITINS = {
-            classic: {
-                title: '台北精華 3天2夜',
-                desc: '走訪台北最精華的景點、夜市與美食',
-                days: [
-                    { label: 'Day 1', color: '#059669', title: '城市探索', items: ['上午：台北101觀景台（建議早上避開人潮）', '中午：信義商圈午餐，推薦鼎泰豐或饒河街', '下午：象山親山步道，眺望101與城市全景', '傍晚：四四南村文創市集（假日）', '晚上：臨江街夜市（通化街），品嚐蚵仔麵線、大腸包小腸'] },
-                    { label: 'Day 2', color: '#0284c7', title: '文化懷舊', items: ['上午：中正紀念堂（10:00整點衛兵交接儀式）', '午餐：附近永康街牛肉麵', '下午：大安森林公園散步 → 師大夜市', '傍晚：松山文創園區', '晚上：士林夜市（必吃士林大香腸、豬血糕）'] },
-                    { label: 'Day 3', color: '#f59e0b', title: '山城老街', items: ['上午：搭乘火車/公車至九份（建議搭基隆客運788+瑞芳火車）', '中午：九份阿妹茶樓，喝茶賞景', '下午：十分老街（放天燈 NT$200/個）', '傍晚：基隆廟口夜市收尾'] },
-                ]
-            },
-            north: {
-                title: '北台灣 5天4夜',
-                desc: '從台北延伸到北海岸、宜蘭等地',
-                days: [
-                    { label: 'Day 1', color: '#059669', title: '台北抵達 & 夜市初探', items: ['機場捷運入住 → 西門町逛街', '饒河街夜市初嚐台灣小吃'] },
-                    { label: 'Day 2', color: '#0284c7', title: '台北精華', items: ['台北101 → 國立故宮博物院 → 士林夜市'] },
-                    { label: 'Day 3', color: '#f59e0b', title: '九份&北海岸', items: ['九份老街 → 十分天燈 → 野柳地質公園'] },
-                    { label: 'Day 4', color: '#8b5cf6', title: '陽明山&北投', items: ['陽明山花季（3-4月）/ 竹子湖海芋 → 北投溫泉', '下午：淡水老街漁人碼頭夕陽'] },
-                    { label: 'Day 5', color: '#ef4444', title: '宜蘭一日遊', items: ['搭乘台鐵至宜蘭（50分鐘）', '礁溪溫泉 → 傳藝中心 → 羅東夜市'] },
-                ]
-            },
-            south: {
-                title: '南台灣 4天3夜',
-                desc: '台南古都文化與墾丁海灘',
-                days: [
-                    { label: 'Day 1', color: '#059669', title: '高鐵至台南', items: ['搭高鐵至台南（1.5小時）', '赤崁樓 → 安平古堡 → 花園夜市'] },
-                    { label: 'Day 2', color: '#0284c7', title: '台南深度文化', items: ['林百貨 → 孔廟 → 武廟', '國華街小吃午餐', '奇美博物館下午'] },
-                    { label: 'Day 3', color: '#f59e0b', title: '高雄海港城市', items: ['搭台鐵至高雄（40分鐘）', '駁二藝術特區 → 西子灣夕陽', '六合夜市晚餐'] },
-                    { label: 'Day 4', color: '#ef4444', title: '墾丁海灘', items: ['搭客運至墾丁（2小時）', '大灣衝浪 or 浮潛', '墾丁大街伴手禮'] },
-                ]
-            }
-        };
+<!-- ──────────── HOTEL PANEL ──────────── -->
+<div class="panel" id="panel-hotel">
+    <div class="section-head">
+        <div class="section-label" style="color:#7c3aed">Accommodation</div>
+        <h2 class="section-title">住宿推薦</h2>
+        <p class="section-sub">從豪華酒店到特色民宿，找到最適合你的住宿</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="hotel-city-tabs">
+            <button class="chip active" style="background:#f5f3ff;color:#7c3aed" onclick="filterHotel('all',this)">🌟 全部</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterHotel('taipei',this)">🏙️ 台北</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterHotel('taichung',this)">⛰️ 台中</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterHotel('tainan',this)">🏛️ 台南</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterHotel('kaohsiung',this)">🌺 高雄</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterHotel('hualien',this)">🏔️ 花蓮</button>
+        </div>
+    </div>
+    <div class="section-body">
+        <div style="background:#f0fdf4;border-radius:16px;padding:14px 16px;margin-bottom:20px;display:flex;gap:12px;align-items:center">
+            <span style="font-size:24px">💡</span>
+            <div style="font-size:13px;color:#14532d">訂房建議：台灣住宿旺季為暑假（7-8月）、春節及連假，建議提早2-4週訂房。台北信義區、大安區生活機能最佳。</div>
+        </div>
+        <div class="card-grid" id="hotel-grid"></div>
+    </div>
+</div>
 
-        const CHECKLIST_ITEMS = [
-            '台灣5G SIM卡（機場入境大廳購買）',
-            '悠遊卡 EasyCard（機場/超商/捷運站購買）',
-            '護照（效期6個月以上）',
-            '信用卡（Visa/Master 台灣皆通用）',
-            '備用現金台幣（夜市多不收卡）',
-            '行動電源（導航 & Google Maps耗電）',
-            '輕便雨傘（台北午後易下雨）',
-            '台灣地圖 App（Google Maps 已夠用）',
-            'Google 翻譯 App（備用）',
-            '訂好住宿確認單（部分飯店需確認）',
-            '旅遊保險（建議購買含醫療的計劃）',
-            '防曬乳（台灣夏天紫外線強烈）',
-        ];
+<!-- ──────────── TRANSPORT PANEL ──────────── -->
+<div class="panel" id="panel-transport">
+    <div class="section-head">
+        <div class="section-label" style="color:#0284c7">Getting Around</div>
+        <h2 class="section-title">交通指南</h2>
+        <p class="section-sub">捷運 · 高鐵 · 機場 · YouBike · 悠遊卡</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="transport-tabs">
+            <button class="chip active" style="background:#eff6ff;color:#2563eb" onclick="switchTransport('mrt',this)">🚇 台北捷運</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchTransport('airport',this)">✈️ 機場交通</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchTransport('hsr',this)">🚄 台灣高鐵</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchTransport('easycard',this)">💳 悠遊卡</button>
+        </div>
+    </div>
+    <div class="section-body" id="transport-body">
+        <!-- injected by JS -->
+    </div>
+</div>
 
-        const TIPS = [
-            { icon: '🏪', title: '便利商店是你的好朋友', content: '7-11、全家、萊爾富24小時無處不在。可儲值悠遊卡、ATM提款、買熱食、送洗等等，幾乎什麼都能辦。' },
-            { icon: '🚇', title: '悠遊卡搭捷運最划算', content: '搭捷運持悠遊卡享有八五折優惠，搭公車轉乘亦有優惠。可在捷運站、超商購買，最低儲值100元，建議先儲值500元。' },
-            { icon: '🍜', title: '用餐潛規則', content: '多數小吃店不提供外帶餐具，夜市有些需要付碗盤費。小費非台灣文化習慣，餐廳一般不用給小費。' },
-            { icon: '🚕', title: '安全叫車', content: '建議使用「台灣大車隊 55688」App叫車，價格透明、司機有照，比路邊攔車更安全。Uber 也通行全台。' },
-            { icon: '💳', title: '刷卡 vs. 現金', content: '百貨公司、連鎖餐廳、便利商店普遍可刷卡。但夜市、傳統小吃店、路邊攤幾乎都只收現金，出門記得帶些台幣。' },
-            { icon: '🏥', title: '緊急電話', content: '警察：110 / 救護車&消防：119 / 旅遊服務專線（中英）：0800-011-765 / 駐台辦事處備用電話請出發前記錄。' },
-            { icon: '🌡️', title: '氣候與穿著', content: '台灣分明顯的北（台北）南（高雄）差異。夏天（5-9月）炎熱潮濕達35°C，冬天台北可低至10°C。建議洋蔥式穿法。' },
-            { icon: '🌐', title: 'WiFi 上網選擇', content: '機場有免費WiFi。建議購買當地SIM（NT$300-400/5天無限量）。各大捷運站、便利商店也有iTaiwan公共WiFi。' },
-        ];
+<!-- ──────────── SHOPPING PANEL ──────────── -->
+<div class="panel" id="panel-shopping">
+    <div class="section-head">
+        <div class="section-label" style="color:#db2777">Shopping Guide</div>
+        <h2 class="section-title">購物攻略</h2>
+        <p class="section-sub">夜市 · 百貨商圈 · 伴手禮 · 文創市集</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="shop-cat-tabs">
+            <button class="chip active" style="background:#fdf2f8;color:#db2777" onclick="filterShop('all',this)">🛍️ 全部</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterShop('nightmarket',this)">🌃 夜市購物</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterShop('mall',this)">🏬 百貨商圈</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterShop('souvenir',this)">🎁 伴手禮</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="filterShop('creative',this)">🎨 文創市集</button>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="card-grid" id="shop-grid"></div>
+    </div>
+</div>
 
-        const ATTRACTIONS = {
-            taipei101: {
-                name: '台北 101',
-                subtitle: 'Taipei 101',
-                tags: ['地標', '夜景', '購物'],
-                desc: '台北 101 是台灣最著名的地標建築，高達 508 公尺，曾是全球最高樓（2004-2010）。89樓觀景台可俯瞰台北盆地全景，夜景尤為壯觀。地下樓層遍布頂級名品，B1~B5為美食街。',
-                info: ['📍 台北市信義區信義路五段7號', '🚇 板南線 → 台北101/世貿站 出口4', '⏰ 觀景台 09:00~22:00（建議平日早去）', '💰 觀景台票價 NT$600，ATM提款/信用卡皆可'],
-                map: 'https://maps.google.com/maps?q=台北101&output=embed'
-            },
-            taroko: {
-                name: '太魯閣國家公園',
-                subtitle: 'Taroko National Park',
-                tags: ['自然', '健行', '峽谷'],
-                desc: '太魯閣是台灣最壯麗的自然奇景，由大理石切割而成的峽谷，岩壁高達 1000 公尺。必訪景點包括燕子口步道、布洛灣台地、天祥地區。建議提前在「太魯閣國家公園官網」申請步道入山許可。',
-                info: ['📍 花蓮縣秀林鄉，從花蓮市區約30分鐘', '🚌 花蓮市區搭太魯閣號或租機車前往', '⏰ 全天開放，但部分步道需申請許可', '💰 入園免費，燕子口等步道有人數管制'],
-                map: 'https://maps.google.com/maps?q=太魯閣國家公園&output=embed'
-            },
-            jiufen: {
-                name: '九份老街',
-                subtitle: 'Jiufen Old Street',
-                tags: ['文化', '老街', '夜景'],
-                desc: '九份是一座依山而建的金礦小鎮，因《神隱少女》的宮崎駿靈感連結而聞名於世。老街上的阿妹茶樓、石階石板路、紅燈籠，在傍晚時分呈現令人窒息的美景。黃金瀑布和地質公園也在附近。',
-                info: ['📍 新北市瑞芳區，從台北約1.5小時', '🚌 台鐵→瑞芳站→轉795路公車15分鐘', '⏰ 建議下午3點後抵達，可觀賞日落與夜景', '💰 入街免費，阿妹茶樓低消約 NT$250/人'],
-                map: 'https://maps.google.com/maps?q=九份老街&output=embed'
-            }
-        };
+<!-- ──────────── ITINERARY PANEL ──────────── -->
+<div class="panel" id="panel-itin">
+    <div class="section-head">
+        <div class="section-label" style="color:#f59e0b">Travel Plan</div>
+        <h2 class="section-title">精心規劃行程</h2>
+        <p class="section-sub">多種主題行程，讓你玩遍台灣精華</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="itin-tabs">
+            <button class="chip active" style="background:#fef3c7;color:#d97706" onclick="switchItin('classic',this)">❤️ 台北3天</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchItin('north',this)">🏔️ 北台灣5天</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchItin('south',this)">🌺 南台灣4天</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchItin('east',this)">🏞️ 東台灣3天</button>
+        </div>
+    </div>
+    <div class="section-body" id="itin-content"></div>
+</div>
 
-        // ─── INIT ────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', () => {
-            // Swiper
-            new Swiper('.main-swiper', {
-                effect: 'coverflow', centeredSlides: true, slidesPerView: 'auto',
-                coverflowEffect: { rotate: 5, stretch: 0, depth: 80, modifier: 1, slideShadows: false },
-                pagination: { el: '.swiper-pagination', clickable: true }
-            });
-            // MRT dropdowns
-            const from = document.getElementById('mrt-from');
-            const to = document.getElementById('mrt-to');
-            MRT_LINES.forEach(line => {
-                [from, to].forEach(sel => {
-                    const grp = document.createElement('optgroup');
-                    grp.label = line.name;
-                    line.stations.forEach(st => {
-                        const opt = document.createElement('option');
-                        opt.value = `${st.code}::${line.id}`;
-                        opt.textContent = `${st.code} ${st.name}`;
-                        grp.appendChild(opt);
-                    });
-                    sel.appendChild(grp.cloneNode(true));
+<!-- ──────────── TIPS PANEL ──────────── -->
+<div class="panel" id="panel-tips">
+    <div class="section-head">
+        <div class="section-label" style="color:#8b5cf6">Taiwan 101</div>
+        <h2 class="section-title">台灣旅遊小知識</h2>
+        <p class="section-sub">旅行前必讀，讓你更快融入台灣生活</p>
+    </div>
+    <div class="section-body">
+        <div class="card-grid" id="tips-container"></div>
+    </div>
+</div>
+
+<!-- ──────────── CHECKLIST PANEL ──────────── -->
+<div class="panel" id="panel-checklist">
+    <div class="section-head">
+        <div class="section-label" style="color:#1e293b">Must-Have</div>
+        <h2 class="section-title">旅行全準備清單</h2>
+        <p class="section-sub">點擊勾選，確保萬無一失</p>
+    </div>
+    <div class="section-body">
+        <div id="checklist-container" style="display:grid;gap:10px;max-width:600px"></div>
+        <button onclick="resetChecklist()" style="margin-top:20px;background:#f1f5f9;color:#64748b;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer">
+            🔄 重置清單
+        </button>
+    </div>
+</div>
+
+</div><!-- end main-area -->
+
+<!-- ═══ MOBILE BOTTOM NAV ═══ -->
+<nav class="bottom-nav" id="bottom-nav">
+    <button class="bnav-item active" id="bnav-home" onclick="showPanel('home',document.querySelectorAll('.nav-link')[0]);setBottomNav('bnav-home')">
+        <span class="bnav-icon">🏠</span>首頁
+    </button>
+    <button class="bnav-item" id="bnav-sights" onclick="showPanel('sights',document.querySelectorAll('.nav-link')[1]);setBottomNav('bnav-sights')">
+        <span class="bnav-icon">🗺️</span>景點
+    </button>
+    <button class="bnav-item" id="bnav-food" onclick="showPanel('food',document.querySelectorAll('.nav-link')[2]);setBottomNav('bnav-food')">
+        <span class="bnav-icon">🍜</span>美食
+    </button>
+    <button class="bnav-item" id="bnav-transport" onclick="showPanel('transport',document.querySelectorAll('.nav-link')[4]);setBottomNav('bnav-transport')">
+        <span class="bnav-icon">🚇</span>交通
+    </button>
+    <button class="bnav-item" id="bnav-more" onclick="toggleSidebar()">
+        <span class="bnav-icon">☰</span>更多
+    </button>
+</nav>
+
+<!-- ═══ ATTRACTION MODAL ═══ -->
+<div id="modal-backdrop" onclick="closeModal(event)">
+    <div id="modal-box">
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+
+const SIGHTS = [
+    { id:'taipei101', region:'north', tags:['地標','夜景','購物'], icon:'🏙️',
+      name:'台北 101', sub:'Taipei 101 · 信義區',
+      desc:'高 508 公尺，曾為全球最高樓。89 樓觀景台可 360° 俯瞰台北盆地，夜景壯觀。地下 B1~B5 為精品美食街。',
+      info:['📍 台北市信義區信義路五段7號','🚇 板南線 → 台北101/世貿站 出口4','⏰ 觀景台 09:00–22:00','💰 票價 NT$600，建議平日早上前往'],
+    },
+    { id:'jiufen', region:'north', tags:['老街','夜景','文化'], icon:'🏮',
+      name:'九份老街', sub:'Jiufen Old Street · 新北市',
+      desc:'依山而建的礦業小鎮，石階石板路、紅燈籠，傍晚呈現令人屏息的美景。《神隱少女》的靈感來源之一。',
+      info:['📍 新北市瑞芳區','🚌 台鐵→瑞芳→795公車15分鐘','⏰ 建議下午3點後抵達觀日落','💰 入街免費，阿妹茶樓低消約 NT$250'],
+    },
+    { id:'yangmingshan', region:'north', tags:['自然','健行','溫泉'], icon:'🌋',
+      name:'陽明山國家公園', sub:'Yangmingshan · 台北北部',
+      desc:'距台北市中心僅30分鐘，春天賞花、夏天避暑、冬天泡溫泉。硫磺谷、竹子湖海芋、擎天崗草原都是熱門景點。',
+      info:['📍 台北市士林區/北投區','🚌 搭紅5公車直達','⏰ 全年開放','💰 部分溫泉設施需費用'],
+    },
+    { id:'tamsui', region:'north', tags:['老街','海景','夕陽'], icon:'🌅',
+      name:'淡水老街 & 漁人碼頭', sub:'Tamsui · 新北市',
+      desc:'台北捷運終點，淡水河出海口的歷史小鎮。阿給、魚丸湯、鐵蛋是必吃小吃。漁人碼頭的夕陽是台北最佳觀賞地之一。',
+      info:['📍 新北市淡水區','🚇 淡水信義線 → 淡水站','⏰ 全天，建議傍晚到漁人碼頭','💰 免費入場'],
+    },
+    { id:'shifen', region:'north', tags:['天燈','瀑布','老街'], icon:'🏮',
+      name:'十分老街 & 天燈', sub:'Shifen · 新北市平溪',
+      desc:'台灣最著名的天燈施放地，在老街鐵道上放天燈是獨特體驗。附近的十分瀑布有「台灣尼加拉」之稱，寬達 40 公尺。',
+      info:['📍 新北市平溪區','🚌 從瑞芳搭平溪線火車','⏰ 全天開放','💰 天燈 NT$150-200/個，瀑布NT$80'],
+    },
+    { id:'sunmoon', region:'central', tags:['湖泊','自然','原住民'], icon:'🌊',
+      name:'日月潭', sub:'Sun Moon Lake · 南投縣',
+      desc:'台灣最大的天然湖泊，四季皆美。邵族傳統文化、環湖自行車道（30公里）、玄光寺、纜車等設施完善，是全台最受歡迎的度假勝地之一。',
+      info:['📍 南投縣魚池鄉','🚌 從台中搭客運約2小時','⏰ 全天開放','💰 遊湖船票 NT$300，纜車 NT$260'],
+    },
+    { id:'alishan', region:'central', tags:['森林','日出','高山茶'], icon:'🌲',
+      name:'阿里山國家森林遊樂區', sub:'Alishan · 嘉義縣',
+      desc:'台灣最著名的高山景區，以日出、雲海、日本神木群聞名。小火車穿梭森林間，春天吉野櫻花盛開，是台灣賞花聖地。',
+      info:['📍 嘉義縣阿里山鄉','🚌 嘉義搭阿里山公路客運','⏰ 全年開放，建議清晨看日出','💰 入園費 NT$200'],
+    },
+    { id:'taroko', region:'east', tags:['峽谷','健行','自然'], icon:'🏔️',
+      name:'太魯閣國家公園', sub:'Taroko Gorge · 花蓮縣',
+      desc:'台灣最壯麗的自然奇景，大理石峽谷岩壁高達 1000 公尺。燕子口步道、布洛灣、天祥地區。部分步道需提前申請入山許可。',
+      info:['📍 花蓮縣秀林鄉','🚌 花蓮市區搭太魯閣客運','⏰ 全天，建議平日前往','💰 入園免費，部分步道有人數管制'],
+    },
+    { id:'hualien', region:'east', tags:['海景','石灰岩','自行車'], icon:'🌊',
+      name:'七星潭', sub:'Qixingtan · 花蓮市',
+      desc:'花蓮北方的弧形礫石海灣，蔚藍太平洋配上中央山脈，視野壯闊。附近有自行車道，早晨可欣賞日出，傍晚可賞夕陽。',
+      info:['📍 花蓮縣新城鄉','🚕 花蓮市區計程車約15分鐘','⏰ 全天開放','💰 免費'],
+    },
+    { id:'kenting', region:'south', tags:['海灘','浮潛','墾丁大街'], icon:'🏖️',
+      name:'墾丁國家公園', sub:'Kenting · 屏東縣',
+      desc:'台灣最南端的國家公園，熱帶氣候全年溫暖。大灣沙灘、小灣衝浪、珊瑚礁潛水，以及夜晚熱鬧的墾丁大街都是必訪之處。',
+      info:['📍 屏東縣恆春鎮','🚌 高雄搭客運約2小時','⏰ 全天開放','💰 入園免費，海上活動另計'],
+    },
+    { id:'tainan', region:'south', tags:['古廟','歷史','小吃'], icon:'🏛️',
+      name:'台南古蹟群', sub:'Tainan Historic Sites',
+      desc:'台灣最古老的城市，300年歷史的赤崁樓、安平古堡、孔廟群集中於市區，步行可達。老街美食密度全台最高，一天根本吃不完。',
+      info:['📍 台南市中西區','🚄 高鐵+接駁至台南市區','⏰ 各景點 08:30–17:30','💰 赤崁樓 NT$70，孔廟免費'],
+    },
+    { id:'penghu', region:'island', tags:['海島','珊瑚礁','風車'], icon:'🏝️',
+      name:'澎湖群島', sub:'Penghu · 台灣海峽',
+      desc:'台灣本島西方的美麗群島，夏季（5-9月）是旅遊旺季。玄武岩地質景觀、菊島藍洞浮潛、跨海大橋騎車是三大特色體驗。',
+      info:['📍 澎湖縣馬公市','✈️ 台北/台中/高雄搭飛機（45分鐘）','⏰ 全年，夏季最佳','💰 機票單程約 NT$1500-3000'],
+    },
+    { id:'xiaoliu', region:'island', tags:['浮潛','珊瑚','慢活'], icon:'🐠',
+      name:'小琉球', sub:'Little Liuqiu · 屏東縣',
+      desc:'屏東外海的珊瑚礁島嶼，以清澈海水和豐富海龜生態著名。租機車環島一圈約 1.5 小時，可在花瓶岩、美人洞等景點與海龜同游。',
+      info:['📍 屏東縣琉球鄉','⛴️ 東港搭船約30分鐘','⏰ 全年，避開颱風季','💰 船票來回 NT$460'],
+    },
+];
+
+const FOOD_DATA = [
+    { cat:'nightmarket', icon:'🌭', name:'士林大香腸', sub:'士林夜市 · 台北',
+      desc:'台灣最大夜市的招牌小吃，大腸包小腸—糯米腸包覆豬肉香腸，搭配蒜頭醃菜，一口咬下是絕妙滋味。',
+      price:'NT$60', tip:'士林夜市最佳入口：劍潭捷運站步行5分鐘' },
+    { cat:'nightmarket', icon:'🦪', name:'蚵仔煎', sub:'全台夜市 · 台灣必吃',
+      desc:'台灣最具代表性的夜市小吃！鮮蚵、雞蛋、番薯粉漿煎成，淋上紅色甜辣醬，外酥內嫩，是外國觀光客指定必吃。',
+      price:'NT$60-80', tip:'推薦地：台南廟口蚵仔煎、永康街' },
+    { cat:'nightmarket', icon:'🍢', name:'鹽酥雞', sub:'全台夜市 · 必吃',
+      desc:'台灣的炸雞文化！各種食材裹粉下鍋，炸好後撒九層塔、胡椒鹽。香酥可口，是半夜宵夜的最佳選擇。',
+      price:'NT$100-200', tip:'推薦：許記鹽酥雞（台北）、各地攤位' },
+    { cat:'nightmarket', icon:'🧇', name:'蚵仔麵線', sub:'廟口夜市 · 全台',
+      desc:'台灣版的快餐—麵線加蚵仔或大腸，勾芡湯底濃稠，淋上烏醋香菜，鮮味十足，是台灣的靈魂食物之一。',
+      price:'NT$50-70', tip:'推薦：基隆廟口麵線、阿宗麵線（台北西門町）' },
+    { cat:'nightmarket', icon:'🥚', name:'臭豆腐', sub:'全台夜市',
+      desc:'外表嚇人但香味誘人！台灣的臭豆腐有炸的（外酥脆）和麻辣湯的兩種，搭配泡菜，是台灣最具話題性的小吃。',
+      price:'NT$50-80', tip:'初次嘗試建議從炸臭豆腐+泡菜開始' },
+    { cat:'nightmarket', icon:'🍡', name:'豬血糕', sub:'士林/饒河夜市',
+      desc:'以豬血和糯米製成的點心，串在竹籤上沾花生粉和香菜，口感Q彈，是標誌性的台灣夜市食物，初次嘗試充滿話題性！',
+      price:'NT$30-50', tip:'饒河街夜市入口就有著名攤位' },
+    { cat:'restaurant', icon:'🥟', name:'鼎泰豐 Din Tai Fung', sub:'信義/中山 · 台北',
+      desc:'全球知名的小籠包名店，曾獲米其林星級肯定。每顆小籠包精準18折，湯汁豐富、皮薄Q彈。排隊等待是必要的，建議開館前抵達或使用 APP 取號。',
+      price:'NT$300-500/人', tip:'建議網路預約或早到取號，推薦信義本店' },
+    { cat:'restaurant', icon:'🍜', name:'永康牛肉麵', sub:'永康街 · 大安區台北',
+      desc:'台灣牛肉麵文化的代表。紅燒湯底香濃、牛肉軟嫩，搭配Q彈手工麵條。永康街有多家百年老店，各有特色。',
+      price:'NT$200-350/碗', tip:'建議平日中午前往，可避開排隊人潮' },
+    { cat:'restaurant', icon:'🥣', name:'阜杭豆漿', sub:'善導寺站 · 台北',
+      desc:'台北最著名的豆漿店，每日清晨大排長龍。現做的厚燒餅、蛋餅、鹹豆漿，搭配一杯濃郁熱豆漿，是台北最正宗的早餐體驗。',
+      price:'NT$50-150/人', tip:'每日05:30開門，建議7點前抵達；週一公休' },
+    { cat:'drink', icon:'🧋', name:'珍珠奶茶 Bubble Tea', sub:'全台 · 台灣之光',
+      desc:'台灣發明的飲品，已征服全球！Q彈珍珠（粉圓）配上各式茶底和鮮奶，可客製甜度和冰量。到台灣一定要喝到道地的珍奶！',
+      price:'NT$60-90', tip:'推薦品牌：春水堂（創始店）、老虎堂（台南）、一芳' },
+    { cat:'drink', icon:'🍵', name:'台灣高山茶', sub:'阿里山/梨山/日月潭',
+      desc:'台灣是世界頂級烏龍茶產地。阿里山烏龍、梨山高冷茶、日月潭紅茶各有特色。茶葉是最受歡迎的伴手禮之一。',
+      price:'NT$200-2000/100g', tip:'茶葉可在茶行試喝再購買，阿里山有農家直銷' },
+    { cat:'regional', icon:'🍲', name:'台南牛肉湯', sub:'台南市 · 清晨限定',
+      desc:'台南特有的早餐文化！凌晨3點開始，用溫體牛肉涮入清澈高湯，搭配薑絲和沙茶醬，鮮甜嫩滑。建議清晨6-8點前往，過了就賣完了！',
+      price:'NT$100-180/碗', tip:'推薦：六千牛肉湯（凌晨開業）、阿裕牛肉涮涮鍋' },
+    { cat:'regional', icon:'🍚', name:'滷肉飯 Braised Pork Rice', sub:'全台 · 國民料理',
+      desc:'台灣的靈魂料理！肥瘦相間的豬肉丁以醬油、五香、冰糖長時間滷製，淋在白飯上，看似平凡卻讓人念念不忘。每家店都有獨門配方。',
+      price:'NT$30-60/碗', tip:'推薦：金峰滷肉飯（台北）、武廟滷肉飯（台南）' },
+    { cat:'regional', icon:'🥐', name:'台中太陽餅', sub:'台中市 · 百年名點',
+      desc:'台中最著名的糕點，酥脆餅皮包裹麥芽糖內餡，甜而不膩。中山路上有多家老字號，是從台中回去必帶的伴手禮。',
+      price:'NT$150-300/盒', tip:'推薦：太陽堂老店、裕珍馨、南和興糕餅' },
+];
+
+const HOTEL_DATA = [
+    { city:'taipei', budget:'luxury', icon:'🌟', stars:'⭐⭐⭐⭐⭐',
+      name:'君品酒店 Palais de Chine', sub:'台北車站旁 · 頂級奢華',
+      desc:'位於台北車站正上方，法式宮廷風格裝潢，連結新光三越與Q廣場。交通極便利，連接高鐵、台鐵、捷運。',
+      price:'NT$8,000 起/晚', link:'https://www.booking.com/hotel/tw/palais-de-chine.html' },
+    { city:'taipei', budget:'luxury', icon:'🎸', stars:'⭐⭐⭐⭐⭐',
+      name:'W Taipei', sub:'信義商圈 · 設計酒店',
+      desc:'位於台北最時尚的信義商圈，鄰近台北101。前衛設計風格，WET泳池酒吧俯瞰城市，是追求潮流旅客的首選。',
+      price:'NT$9,000 起/晚', link:'https://www.marriott.com/hotels/travel/tpewh-w-taipei/' },
+    { city:'taipei', budget:'mid', icon:'🏢', stars:'⭐⭐⭐⭐',
+      name:'老爺行旅 The Place Taipei', sub:'南京東路 · 精品旅館',
+      desc:'台灣本土設計旅館品牌，以台灣本土文化設計貫穿空間。位於中山商圈，鄰近精品街、誠品生活，出行方便。',
+      price:'NT$3,500 起/晚', link:'https://www.theplacetaipei.com.tw/' },
+    { city:'taipei', budget:'budget', icon:'🛏️', stars:'⭐⭐⭐',
+      name:'康橋大飯店 Kindness Hotel', sub:'全台多處 · 平價連鎖',
+      desc:'台灣本土連鎖商旅，各大城市皆有分店，提供台式早餐、悠遊卡借用、自助洗衣等實用服務，是背包客和商務旅客的熱門選擇。',
+      price:'NT$1,200 起/晚', link:'https://www.kindness-hotel.com.tw/' },
+    { city:'taichung', budget:'mid', icon:'🌳', stars:'⭐⭐⭐⭐',
+      name:'薆悅酒店 Gala Hotel Taichung', sub:'台中市中心 · 現代設計',
+      desc:'台中知名設計旅館，鄰近逢甲夜市和台中新站。餐廳提供台式早餐，交通方便，是暢遊台中的理想基地。',
+      price:'NT$2,800 起/晚', link:'https://www.booking.com/hotel/tw/gala-hotel-taichung.html' },
+    { city:'tainan', budget:'mid', icon:'🏛️', stars:'⭐⭐⭐⭐',
+      name:'台南富信大飯店 Hotel Fusin', sub:'台南市東區 · 商務首選',
+      desc:'台南最知名的商務飯店之一，鄰近台南高鐵站接駁，地理位置優越。台式自助早餐豐盛，是探索台南古蹟的理想住宿。',
+      price:'NT$2,200 起/晚', link:'https://www.booking.com/hotel/tw/taiwan-fu-hsin-hotel.html' },
+    { city:'kaohsiung', budget:'luxury', icon:'🌺', stars:'⭐⭐⭐⭐⭐',
+      name:'高雄漢來大飯店 Grand Hi-Lai', sub:'苓雅區 · 高雄地標飯店',
+      desc:'高雄最具代表性的頂級飯店，47層樓俯瞰愛河與高雄港。頂樓觀景餐廳與無邊際泳池是亮點，連結漢神巨蛋商圈。',
+      price:'NT$5,000 起/晚', link:'https://www.grand-hilai.com.tw/' },
+    { city:'hualien', budget:'mid', icon:'🏔️', stars:'⭐⭐⭐⭐',
+      name:'花蓮翰品酒店 Chateau de Chine', sub:'花蓮市 · 質感旅館',
+      desc:'花蓮市中心的精品旅館，距花蓮火車站步行10分鐘。太魯閣一日遊出發的理想基地，法式早餐豐盛，服務細膩。',
+      price:'NT$3,000 起/晚', link:'https://www.chateaudechine.com/hualien/' },
+    { city:'hualien', budget:'special', icon:'🌿', stars:'⭐⭐⭐⭐',
+      name:'雲山水民宿', sub:'壽豐鄉 · 景觀農場',
+      desc:'花蓮縣著名的景觀農場民宿，群山環繞的草原和湖泊令人心曠神怡。適合放慢腳步體驗台灣慢活文化，提供腳踏車租借。',
+      price:'NT$2,500 起/晚', link:'https://www.booking.com/hotel/tw/yunshanshuimilitary-dormitory.html' },
+];
+
+const SHOP_DATA = [
+    { cat:'nightmarket', icon:'🌃', name:'士林夜市', sub:'劍潭站 · 台北最大夜市',
+      desc:'台灣規模最大、最知名的夜市，分為美食區和購物區兩部分。服飾、飾品、3C配件、玩具應有盡有，價格親民。',
+      tip:'每晚約 17:00-24:00 營業，週末更熱鬧', hours:'17:00–24:00', location:'捷運劍潭站' },
+    { cat:'nightmarket', icon:'🏮', name:'饒河街觀光夜市', sub:'松山站 · 美食精品夜市',
+      desc:'比士林更精緻的夜市體驗，長約 600 公尺的直線夜市，胡椒餅、藥燉排骨等名物集中，購物服飾選擇也很豐富。',
+      tip:'台北最具口碑的觀光夜市之一', hours:'17:00–23:00', location:'捷運松山站步行5分鐘' },
+    { cat:'nightmarket', icon:'🎡', name:'逢甲夜市', sub:'台中市 · 全台最大夜市',
+      desc:'以面積計算為全台最大夜市，以創意小吃著名。繼光香香雞、逢甲羊肉炸、草莓芋圓等在此起源。服飾選購性價比高。',
+      tip:'建議避開週末人潮，平日更舒適', hours:'16:00–02:00', location:'台中市西屯區' },
+    { cat:'mall', icon:'🏬', name:'信義商圈', sub:'台北101周邊 · 精品聚集地',
+      desc:'台北最高端的購物商圈，LOUIS VUITTON、Hermès、Chanel等頂級精品齊聚。微風信義、ATT 4 Fun、統一時代等多家百貨連成一片，可雨天室內逛完整區。',
+      tip:'台北101觀景台買票可在商場消費抵扣', hours:'11:00–22:00', location:'捷運台北101/世貿站' },
+    { cat:'mall', icon:'📚', name:'誠品生活 eslite', sub:'松菸/信義/南西 · 文創旗艦',
+      desc:'台灣最具特色的書店與生活文創複合空間。松山文創園區的誠品生活24小時不打烊，在書香中逛街購物，是台灣文化的象徵。',
+      tip:'誠品松菸24小時，深夜購書是獨特體驗', hours:'各店不同，松菸24hr', location:'多處分店' },
+    { cat:'souvenir', icon:'🍍', name:'鳳梨酥 Pineapple Cake', sub:'全台 · 第一伴手禮',
+      desc:'台灣最受歡迎的伴手禮！酥脆奶油餅皮包裹鳳梨冬瓜餡，甜而不膩。佳德糕餅和微熱山丘是最受旅客推薦的品牌，建議直接至門市購買最新鮮。',
+      tip:'佳德（南京復興）常大排長龍，建議平日上午前往', hours:'各店不同', location:'台北各大糕餅店' },
+    { cat:'souvenir', icon:'🍬', name:'牛軋糖 Nougat', sub:'全台 · 傳統手工點心',
+      desc:'以奶油、花生、蔓越莓等材料製成的手工糖果，口感Q彈不黏牙。各地夜市和伴手禮店都有販售，是送禮的好選擇。',
+      tip:'黑橋牌（台南）、老師傅系列都是知名品牌', hours:'各店不同', location:'夜市/伴手禮店' },
+    { cat:'souvenir', icon:'🍵', name:'台灣茶葉', sub:'阿里山/梨山/坪林',
+      desc:'世界頂級烏龍茶產地。阿里山高山烏龍、梨山茶、坪林包種茶、日月潭紅茶各有特色，適合自用或作為高端伴手禮。',
+      tip:'天仁茗茶（全台連鎖）方便購買，山區農場品質更好', hours:'各店不同', location:'茶葉專賣店/農家' },
+    { cat:'creative', icon:'🎨', name:'華山1914文創園區', sub:'忠孝新生 · 老酒廠變身藝文空間',
+      desc:'由日治時代酒廠改建的文創基地，固定舉辦特展、市集、表演活動。裡面的選品店和咖啡廳都很有特色，週末市集是尋找台灣設計品的好去處。',
+      tip:'週末市集通常10:00-20:00，網站可查活動', hours:'週二-日 11:00–21:00', location:'捷運忠孝新生站步行5分鐘' },
+    { cat:'creative', icon:'🏭', name:'松山文創園區', sub:'國父紀念館 · 菸廠改建園區',
+      desc:'原台北菸廠改建，連結誠品生活。Pinkoi設計師市集、各大展覽、美食餐廳一應俱全。旁邊的大安森林公園可延伸散步。',
+      tip:'誠品松菸館24小時，深夜也可入園逛書', hours:'07:00–22:00（戶外）', location:'捷運國父紀念館站步行5分鐘' },
+];
+
+const TRANSPORT = {
+    mrt: {
+        title: '台北捷運 Taipei MRT',
+        lines: [
+            { id:'blue', name:'🔵 板南線 (Blue Line)', color:'#2563eb', stations:[
+                {code:'BL11',name:'西門 Ximen',note:'西門町商圈、紅樓劇場'},
+                {code:'BL12',name:'台北車站 Main Station',note:'高鐵/台鐵轉乘，地下街'},
+                {code:'BL15',name:'忠孝復興 Zhongxiao Fuxing',note:'SOGO百貨、東區商圈'},
+                {code:'BL18',name:'市政府 City Hall',note:'信義商圈、台北101'},
+                {code:'BL23',name:'南港展覽館',note:'展覽館、轉乘文湖線'},
+            ]},
+            { id:'red', name:'🔴 淡水信義線 (Red Line)', color:'#dc2626', stations:[
+                {code:'R05',name:'象山 Xiangshan',note:'象山親山步道，俯瞰台北101'},
+                {code:'R06',name:'台北101/世貿',note:'台北101觀景台、信義百貨'},
+                {code:'R08',name:'中正紀念堂',note:'中正紀念堂、兩廳院'},
+                {code:'R10',name:'台大醫院',note:'二二八和平公園'},
+                {code:'R11',name:'中山 Zhongshan',note:'心中山公園、誠品南西'},
+                {code:'R16',name:'士林 Shilin',note:'士林官邸、故宮轉公車'},
+                {code:'R17',name:'劍潭 Jiantan',note:'士林夜市入口'},
+                {code:'R22',name:'北投 Beitou',note:'北投溫泉博物館'},
+                {code:'R28',name:'淡水 Tamsui',note:'淡水老街、漁人碼頭'},
+            ]},
+            { id:'green', name:'🟢 松山新店線 (Green Line)', color:'#16a34a', stations:[
+                {code:'G13',name:'北門 Beimen',note:'大稻埕碼頭、迪化街'},
+                {code:'G16',name:'古亭 Guting',note:'轉乘橘線、師大夜市附近'},
+                {code:'G19',name:'松山 Songshan',note:'饒河街夜市、慈祐宮'},
+                {code:'G01',name:'新店 Xindian',note:'碧潭吊橋'},
+            ]},
+            { id:'orange', name:'🟠 中和新蘆線 (Orange)', color:'#ea580c', stations:[
+                {code:'O04',name:'大橋頭',note:'延三夜市、大稻埕歷史街'},
+                {code:'O11',name:'忠孝新生',note:'轉乘板南線、華山文創'},
+                {code:'O50',name:'南勢角 Nanshijiao',note:'中和夜市'},
+            ]},
+        ]
+    },
+    airport: {
+        airports: {
+            tpe: { name:'桃園國際機場 (TPE)', desc:'台灣最大國際機場，距台北約40公里。',
+                options:[
+                    {icon:'🚇',title:'機場捷運 A快車',desc:'直達台北車站 38 分鐘，票價 NT$160，每15-30分一班，24小時部分班次直達。'},
+                    {icon:'🚌',title:'國光客運 1819',desc:'24小時營運，途經台北多站，票價約 NT$135，到市中心各主要區域。'},
+                    {icon:'🚕',title:'計程車/Uber',desc:'到台北市區約 NT$1100-1400。建議使用「台灣大車隊 55688」App 叫車。'},
+                ]},
+            tsa: { name:'台北松山機場 (TSA)', desc:'台北市區城市機場，主飛日韓及國內線，離市中心僅15分鐘。',
+                options:[
+                    {icon:'🚇',title:'捷運文湖線 (棕線)',desc:'松山機場站→南京復興→忠孝復興，約10分鐘達市區，票價 NT$30-60。'},
+                    {icon:'🚕',title:'計程車/Uber',desc:'到台北市區約 NT$200-350，含機場附加費。'},
+                ]},
+            khh: { name:'高雄國際機場 (KHH)', desc:'高雄主要機場，鄰近捷運橘線，直通市中心。',
+                options:[
+                    {icon:'🚇',title:'捷運橘線',desc:'機場站搭橘線，約15分鐘到美麗島站，票價 NT$20-50。'},
+                    {icon:'🚕',title:'計程車',desc:'到高雄市區約 NT$200-300。'},
+                ]},
+        }
+    },
+    hsr: {
+        title: '台灣高鐵 Taiwan High Speed Rail',
+        content: [
+            {icon:'🚄',title:'全線12站，高雄↔台北最快90分鐘',desc:'北高之間的主要交通工具，停靠台北、板橋、桃園、新竹、苗栗、台中、彰化、雲林、嘉義、台南、左營（高雄）共12站。'},
+            {icon:'💰',title:'票價與折扣',desc:'台北→台中 NT$700，台北→高雄 NT$1,490（標準車廂）。提早14天可購買「早鳥票」享7折優惠，建議使用官網或App訂票。'},
+            {icon:'🗓️',title:'訂票方式',desc:'高鐵官網 (thsrc.com.tw) 或 官方 App 可線上訂票，憑信用卡或悠遊卡取票。旅遊套票「台灣高鐵3日券/5日券」可無限次搭乘，外籍旅客優先適用。'},
+            {icon:'🏙️',title:'高鐵站交通轉接',desc:'各高鐵站有配套接駁公車到市中心，或轉乘台鐵。台中高鐵站→台中火車站需搭接駁公車或台鐵（約30分鐘）。'},
+        ]
+    },
+    easycard: {
+        title: '悠遊卡 EasyCard',
+        content: [
+            {icon:'💳',title:'什麼是悠遊卡？',desc:'悠遊卡是台灣最通用的IC交通卡，可搭乘台北捷運、公車、台鐵、部分高鐵、YouBike自行車。7-11、全家便利商店、麥當勞等也可消費。'},
+            {icon:'🛒',title:'在哪裡購買？',desc:'機場入境大廳、各捷運站服務台、7-11/全家便利商店均可購買。押金 NT$100，儲值金額另加。建議一抵台就購買。'},
+            {icon:'💵',title:'儲值與退卡',desc:'可在捷運站儲值機、便利商店加值。離台前可至捷運站服務台退卡，退還押金及剩餘金額（需扣手續費NT$20）。'},
+            {icon:'🚲',title:'YouBike 公共自行車',desc:'台灣各大城市均有 YouBike，用悠遊卡掃碼取車，前30分鐘 NT$10，之後每30分NT$10。台北、台中、新竹、高雄等城市皆有。非常適合景點間短途移動。'},
+        ]
+    }
+};
+
+const ITINS = {
+    classic: { title:'台北精華 3天2夜', desc:'走訪台北最精華的景點、夜市與美食',
+        days:[
+            {label:'Day 1',color:'#059669',title:'城市探索',items:['上午：台北101觀景台（建議9-10點避開人潮）','中午：信義商圈鼎泰豐，或饒河街附近小吃','下午：象山親山步道，眺望台北101全景（免費）','傍晚：四四南村文創市集（假日限定）','晚上：臨江街夜市（通化街）—蚵仔麵線、大腸包小腸']},
+            {label:'Day 2',color:'#0284c7',title:'文化懷舊',items:['上午：中正紀念堂（10:00整點衛兵交接儀式）','午餐：附近永康街牛肉麵（多家百年老店）','下午：大安森林公園→師大夜市逛街','傍晚：松山文創園區→誠品生活','晚上：士林夜市（必吃大香腸、豬血糕、鹽酥雞）']},
+            {label:'Day 3',color:'#f59e0b',title:'山城老街',items:['上午：搭火車至瑞芳，轉公車前往九份老街','中午：九份阿妹茶樓，喝茶賞景','下午：十分老街放天燈 NT$150-200','傍晚：基隆廟口夜市—蚵仔煎、天婦羅、一口吃香腸']},
+        ]},
+    north: { title:'北台灣 5天4夜', desc:'從台北延伸到北海岸、宜蘭',
+        days:[
+            {label:'Day 1',color:'#059669',title:'台北抵達',items:['機場捷運入住→西門町逛街','饒河街夜市初嚐台灣小吃']},
+            {label:'Day 2',color:'#0284c7',title:'台北精華',items:['台北101→國立故宮博物院（故宮正館）→士林夜市']},
+            {label:'Day 3',color:'#f59e0b',title:'九份&北海岸',items:['九份老街→十分天燈→野柳地質公園（奇岩地貌）']},
+            {label:'Day 4',color:'#8b5cf6',title:'陽明山&北投',items:['陽明山竹子湖→大屯火山群→北投溫泉，下午淡水老街漁人碼頭夕陽']},
+            {label:'Day 5',color:'#ef4444',title:'宜蘭一日遊',items:['台鐵至礁溪（50分鐘）→礁溪溫泉→傳藝中心→羅東夜市']},
+        ]},
+    south: { title:'南台灣 4天3夜', desc:'台南古都文化與高雄港都，附加墾丁海灘',
+        days:[
+            {label:'Day 1',color:'#059669',title:'高鐵至台南',items:['搭高鐵至台南（1.5小時）','赤崁樓→安平古堡→花園夜市']},
+            {label:'Day 2',color:'#0284c7',title:'台南文化深度',items:['林百貨（台灣最老百貨）→孔廟→武廟','國華街小吃午餐：擔仔麵、棺材板、蝦捲','奇美博物館（免費的私人美術館，世界級館藏）']},
+            {label:'Day 3',color:'#f59e0b',title:'高雄港都',items:['台鐵至高雄（40分鐘）','駁二藝術特區→哈瑪星→西子灣夕陽','六合夜市晚餐—海鮮、木瓜牛奶']},
+            {label:'Day 4',color:'#ef4444',title:'墾丁海灘',items:['搭客運至墾丁（2小時）','大灣衝浪 or 浮潛','墾丁大街伴手禮、回程']},
+        ]},
+    east: { title:'東台灣 3天2夜', desc:'太魯閣峽谷與花東縱谷原始風光',
+        days:[
+            {label:'Day 1',color:'#059669',title:'飛/火車至花蓮',items:['台北搭太魯閣/普悠瑪（2小時）或飛機（45分鐘）','七星潭礫石海灘→花蓮市區','花蓮夜市—公正包子、東大門夜市原住民美食']},
+            {label:'Day 2',color:'#0284c7',title:'太魯閣壯遊',items:['太魯閣國家公園全日遊','燕子口步道→布洛灣→天祥','白楊步道（需申請，可見水濂洞）']},
+            {label:'Day 3',color:'#f59e0b',title:'花東縱谷',items:['租車/騎車遊花東縱谷','光復糖廠→玉里温泉','台鐵回台北（或飛機）']},
+        ]},
+};
+
+const CHECKLIST_ITEMS = [
+    '台灣5G SIM卡（機場入境大廳三大電信商均有攤位）',
+    '悠遊卡 EasyCard（機場/超商/捷運站購買，押金100元）',
+    '護照（效期6個月以上）',
+    '信用卡（Visa/Master台灣通用，AMEX較少接受）',
+    '備用現金台幣（夜市、小吃店多不收卡）',
+    '行動電源（導航+拍照耗電，台灣便利商店可租借）',
+    '輕便雨傘（台北午後雷陣雨頻繁）',
+    '防曬乳SPF50以上（台灣夏天紫外線強烈）',
+    'Google Maps 離線地圖下載（以台灣為範圍）',
+    '訂好住宿確認單（部分飯店要求英文確認信）',
+    '旅遊保險（建議購買含急診醫療的計劃）',
+    '轉接頭（台灣插座 110V/60Hz，兩腳扁插）',
+];
+
+const TIPS = [
+    {icon:'🏪',title:'便利商店是旅人最佳夥伴',content:'7-11、全家、萊爾富 24小時無處不在（台灣密度世界第二）。可以儲值悠遊卡、ATM提款、買熱食、繳費、寄包裹、印文件，幾乎什麼都能辦到。'},
+    {icon:'🚇',title:'悠遊卡搭捷運最划算',content:'搭台北捷運持悠遊卡享有 85 折優惠，搭公車轉乘1小時內免費。可在捷運站、超商購買，建議儲值 NT$500 起步。'},
+    {icon:'🍜',title:'台灣用餐文化',content:'多數小吃店不主動提供衛生紙（夜市往往需要自備）。小費非台灣習慣，一般不需給小費。高檔餐廳可能加收 10% 服務費。'},
+    {icon:'🚕',title:'安全叫車方式',content:'建議使用「台灣大車隊 55688」App 叫車，價格透明、跳錶計費。Uber 也通行全台，通常比一般計程車稍貴但體驗更好。'},
+    {icon:'💳',title:'刷卡 vs 現金',content:'百貨公司、連鎖餐廳、便利商店可刷卡。但夜市、傳統小吃店、廟口攤販幾乎只收現金。建議隨身攜帶 NT$500-1000 備用現金。'},
+    {icon:'🚰',title:'飲水安全',content:'台灣自來水含氯，不建議直接飲用。便利商店礦泉水約 NT$20-30/瓶，或使用旅館的熱水壺。大多數捷運站有免費飲水機。'},
+    {icon:'🌡️',title:'氣候與穿著建議',content:'台灣南北氣候差異大。台北冬天（12-2月）可低至10°C，高雄全年溫暖。夏天（5-9月）全台炎熱達35°C+，建議洋蔥式穿法。'},
+    {icon:'🌐',title:'網路上網攻略',content:'機場有免費WiFi（桃園機場）。建議購買SIM卡：中華電信/台灣之星 NT$300-500/5天無限量。各大捷運站有 iTaiwan 公共WiFi（需申請帳號）。'},
+    {icon:'💱',title:'貨幣兌換',content:'台幣（TWD/NT$），建議在台灣兌換（機場、銀行、全台幣兌換所皆可）。信用卡手續費約1-3%，ATM領現匯率通常較好。1美元≈約30-32台幣。'},
+    {icon:'🏥',title:'就醫與緊急狀況',content:'緊急電話：警察110 / 救護消防119 / 旅遊投訴 0800-011-765。台灣醫療品質高，掛急診費用約 NT$300-700，建議購買含急診的旅遊保險。'},
+];
+
+const ATTRACTIONS = {
+    taipei101: {name:'台北 101',subtitle:'Taipei 101 · 信義區',tags:['地標','夜景','購物'],
+        desc:'台北 101 高達 508 公尺，89樓觀景台可俯瞰台北盆地全景，夜景尤為壯觀。地下B1~B5為美食廣場，1F~4F為精品名牌。',
+        info:['📍 台北市信義區信義路五段7號','🚇 板南線 → 台北101/世貿站 出口4','⏰ 觀景台 09:00–22:00','💰 票價 NT$600，建議平日早上前往'],
+    },
+    taroko: {name:'太魯閣國家公園',subtitle:'Taroko National Park · 花蓮',tags:['自然','峽谷','健行'],
+        desc:'台灣最壯麗的自然奇景，大理石峽谷岩壁高達1000公尺。燕子口步道、白楊步道（需申請）、天祥。建議提前申請步道入山許可。',
+        info:['📍 花蓮縣秀林鄉','🚌 花蓮市區搭太魯閣客運','⏰ 全天開放，部分步道需申請許可','💰 入園免費'],
+    },
+    jiufen: {name:'九份老街',subtitle:'Jiufen Old Street · 新北市',tags:['老街','夜景','文化'],
+        desc:'依山而建的礦業小鎮，石階紅燈籠，傍晚景色令人窒息。阿妹茶樓、豎崎路、基山街是必逛路線。黃金博物館也在附近。',
+        info:['📍 新北市瑞芳區','🚌 台鐵→瑞芳站→795路公車15分鐘','⏰ 建議下午3點後，觀日落與夜景','💰 入街免費，茶樓低消 NT$250/人'],
+    },
+    sunmoon: {name:'日月潭',subtitle:'Sun Moon Lake · 南投縣',tags:['湖泊','自然','原住民文化'],
+        desc:'台灣最大天然湖泊，四季皆美。邵族傳統文化、30公里環湖自行車道、玄光寺碼頭、日月潭纜車俯瞰全景。',
+        info:['📍 南投縣魚池鄉','🚌 台中搭客運約1.5小時','⏰ 全天開放','💰 遊湖船票 NT$300，纜車 NT$260'],
+    },
+    kenting: {name:'墾丁國家公園',subtitle:'Kenting · 屏東縣',tags:['海灘','浮潛','熱帶'],
+        desc:'台灣最南端，全年溫暖，珊瑚礁豐富。大灣衝浪、小灣浮潛、貓鼻頭公園、墾丁大街夜生活，是台灣的熱帶渡假勝地。',
+        info:['📍 屏東縣恆春鎮','🚌 高雄搭客運約2小時','⏰ 全天開放','💰 入園免費，海上活動另計'],
+    },
+};
+
+// ═══════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════
+
+function renderSights(filter='all'){
+    const items = filter==='all' ? SIGHTS : SIGHTS.filter(s=>s.region===filter);
+    document.getElementById('sights-grid').innerHTML = items.map(s=>`
+        <div class="card" style="cursor:pointer" onclick="showAttractionDetail('${s.id}')">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="font-size:36px;line-height:1">${s.icon}</div>
+                <div>
+                    <div style="font-weight:800;font-size:16px">${s.name}</div>
+                    <div style="font-size:12px;color:#94a3b8">${s.sub}</div>
+                </div>
+            </div>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;margin-bottom:12px">${s.desc.length>80?s.desc.slice(0,80)+'…':s.desc}</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                ${s.tags.map(t=>`<span class="info-tag">${t}</span>`).join('')}
+            </div>
+            <div style="margin-top:14px;text-align:right">
+                <span style="font-size:12px;font-weight:700;color:#059669">詳細資訊 →</span>
+            </div>
+        </div>`).join('');
+}
+
+function renderFood(filter='all'){
+    const items = filter==='all' ? FOOD_DATA : FOOD_DATA.filter(f=>f.cat===filter);
+    document.getElementById('food-grid').innerHTML = items.map(f=>`
+        <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="font-size:40px;line-height:1">${f.icon}</div>
+                <div>
+                    <div style="font-weight:800;font-size:16px">${f.name}</div>
+                    <div style="font-size:12px;color:#94a3b8">${f.sub}</div>
+                </div>
+            </div>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;margin-bottom:12px">${f.desc}</p>
+            <div style="background:#fef9ec;border-radius:12px;padding:10px 12px;font-size:12px;color:#92400e">
+                💡 ${f.tip}
+            </div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+                <span class="info-tag">💰 ${f.price}</span>
+            </div>
+        </div>`).join('');
+}
+
+function renderHotel(filter='all'){
+    const items = filter==='all' ? HOTEL_DATA : HOTEL_DATA.filter(h=>h.city===filter);
+    document.getElementById('hotel-grid').innerHTML = items.map(h=>`
+        <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="font-size:36px;line-height:1">${h.icon}</div>
+                <div>
+                    <div style="font-weight:800;font-size:15px">${h.name}</div>
+                    <div style="font-size:11px;color:#94a3b8">${h.sub}</div>
+                    <div style="font-size:13px;margin-top:2px">${h.stars}</div>
+                </div>
+            </div>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;margin-bottom:14px">${h.desc}</p>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="info-tag">💰 ${h.price}</span>
+                <a href="${h.link}" target="_blank" rel="noopener" class="klook-btn">訂房查價 →</a>
+            </div>
+        </div>`).join('');
+}
+
+function renderShop(filter='all'){
+    const items = filter==='all' ? SHOP_DATA : SHOP_DATA.filter(s=>s.cat===filter);
+    document.getElementById('shop-grid').innerHTML = items.map(s=>`
+        <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="font-size:36px;line-height:1">${s.icon}</div>
+                <div>
+                    <div style="font-weight:800;font-size:15px">${s.name}</div>
+                    <div style="font-size:12px;color:#94a3b8">${s.sub}</div>
+                </div>
+            </div>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;margin-bottom:12px">${s.desc}</p>
+            <div style="background:#fdf2f8;border-radius:12px;padding:10px 12px;font-size:12px;color:#9d174d;margin-bottom:10px">
+                📌 ${s.tip}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span class="info-tag">⏰ ${s.hours}</span>
+                <span class="info-tag">📍 ${s.location}</span>
+            </div>
+        </div>`).join('');
+}
+
+function renderTransport(mode='mrt'){
+    const body = document.getElementById('transport-body');
+    if(mode==='mrt'){
+        const d = TRANSPORT.mrt;
+        body.innerHTML = '<div style="margin-bottom:20px;max-width:700px" id="mrt-planner">'
+            + '<div class="card" style="margin-bottom:20px">'
+            + '<div style="font-weight:800;font-size:15px;margin-bottom:16px">🗺️ 路線規劃</div>'
+            + '<div style="display:grid;gap:14px">'
+            + '<div><label style="font-size:11px;font-weight:800;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase">🔵 起點站</label>'
+            + '<select class="tw-select" id="mrt-from" style="margin-top:8px"><option value="">選擇起點...</option></select></div>'
+            + '<div><label style="font-size:11px;font-weight:800;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase">🔴 終點站</label>'
+            + '<select class="tw-select" id="mrt-to" style="margin-top:8px"><option value="">選擇終點...</option></select></div>'
+            + '<button onclick="calcMrt()" style="background:#059669;color:#fff;border:none;padding:14px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer">計算路線 →</button>'
+            + '</div></div>'
+            + '<div id="mrt-result" style="display:none;margin-bottom:20px"></div>'
+            + '</div>'
+            + d.lines.map(line=>`
+                <div style="margin-bottom:16px;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f1f5f9">
+                    <div style="background:${line.color};color:#fff;font-weight:800;font-size:13px;padding:10px 16px">${line.name}</div>
+                    <div style="padding:12px 16px;display:grid;gap:8px">`
+                + line.stations.map(s=>`<div style="display:flex;align-items:center;gap:10px">
+                    <span style="background:${line.color}20;color:${line.color};font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px">${s.code}</span>
+                    <div><div style="font-weight:700;font-size:13px">${s.name}</div><div style="font-size:11px;color:#94a3b8">${s.note}</div></div>
+                    </div>`).join('')
+                + '</div></div>').join('');
+        // populate selects
+        const from = document.getElementById('mrt-from');
+        const to = document.getElementById('mrt-to');
+        TRANSPORT.mrt.lines.forEach(line=>{
+            [from,to].forEach(sel=>{
+                const grp = document.createElement('optgroup');
+                grp.label = line.name;
+                line.stations.forEach(st=>{
+                    const opt = document.createElement('option');
+                    opt.value = `${st.code}::${line.id}`;
+                    opt.textContent = `${st.code} ${st.name}`;
+                    grp.appendChild(opt);
                 });
+                sel.appendChild(grp.cloneNode(true));
             });
-            // Line info
-            const lineDiv = document.getElementById('line-info');
-            MRT_LINES.forEach(line => {
-                const wrap = document.createElement('div');
-                wrap.style.cssText = 'margin-bottom:16px;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f1f5f9';
-                wrap.innerHTML = `<div style="background:${line.color};color:#fff;font-weight:800;font-size:13px;padding:10px 16px">${line.name}</div><div style="padding:12px 16px;display:grid;gap:8px">` +
-                    line.stations.map(s => `<div style="display:flex;align-items:center;gap:10px"><span style="background:${line.color}20;color:${line.color};font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px">${s.code}</span><div><div style="font-weight:700;font-size:13px">${s.name}</div><div style="font-size:11px;color:#94a3b8">${s.note}</div></div></div>`).join('') + '</div>';
-                lineDiv.appendChild(wrap);
-            });
-            // Airport
-            renderAirport('tpe');
-            // Checklist
-            renderChecklist();
-            // Itinerary
-            renderItin('classic');
-            // Tips
-            const tipsDiv = document.getElementById('tips-container');
-            TIPS.forEach(t => {
-                tipsDiv.innerHTML += `<div class="card"><div style="display:flex;align-items:flex-start;gap:16px"><div style="font-size:36px;line-height:1">${t.icon}</div><div><div style="font-weight:800;font-size:16px;margin-bottom:6px">${t.title}</div><div style="color:#64748b;font-size:14px;line-height:1.6">${t.content}</div></div></div></div>`;
-            });
-            // Clock
-            setInterval(() => {
-                const t = new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                document.querySelectorAll('[id$="-clock"]').forEach(el => el.textContent = t);
-            }, 1000);
         });
+    } else if(mode==='airport'){
+        const sel = ['tpe','tsa','khh'];
+        const tabs = `<div style="display:flex;gap:8px;margin-bottom:20px" id="apt-tabs">
+            <button class="chip active" style="background:#eff6ff;color:#2563eb" onclick="switchAirport('tpe',this)">✈️ 桃園 TPE</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchAirport('tsa',this)">🏢 松山 TSA</button>
+            <button class="chip" style="background:#f8fafc;color:#64748b" onclick="switchAirport('khh',this)">🌺 高雄 KHH</button>
+        </div><div id="airport-content"></div>`;
+        body.innerHTML = tabs;
+        renderAirport('tpe');
+    } else if(mode==='hsr'){
+        const d = TRANSPORT.hsr;
+        body.innerHTML = `<h3 style="font-weight:800;font-size:18px;margin-bottom:16px">${d.title}</h3>`
+            + '<div style="display:grid;gap:14px">'
+            + d.content.map(c=>`<div class="card" style="display:flex;gap:16px;align-items:flex-start">
+                <div style="font-size:36px;line-height:1">${c.icon}</div>
+                <div><div style="font-weight:800;font-size:15px;margin-bottom:4px">${c.title}</div>
+                <div style="color:#64748b;font-size:14px;line-height:1.6">${c.desc}</div></div>
+                </div>`).join('') + '</div>';
+    } else if(mode==='easycard'){
+        const d = TRANSPORT.easycard;
+        body.innerHTML = `<h3 style="font-weight:800;font-size:18px;margin-bottom:16px">${d.title}</h3>`
+            + '<div style="display:grid;gap:14px">'
+            + d.content.map(c=>`<div class="card" style="display:flex;gap:16px;align-items:flex-start">
+                <div style="font-size:36px;line-height:1">${c.icon}</div>
+                <div><div style="font-weight:800;font-size:15px;margin-bottom:4px">${c.title}</div>
+                <div style="color:#64748b;font-size:14px;line-height:1.6">${c.desc}</div></div>
+                </div>`).join('') + '</div>';
+    }
+}
 
-        // ─── UTILS ───────────────────────────────────────────
-        function showPanel(id, clickedEl) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById('panel-' + id).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            if (clickedEl) clickedEl.classList.add('active');
-            // close sidebar on mobile
-            document.getElementById('sidebar').classList.remove('open');
-            window.scrollTo(0, 0);
-        }
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-        // Close sidebar on backdrop click
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#sidebar') && !e.target.closest('.mobile-header')) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        });
+function renderAirport(code){
+    const a = TRANSPORT.airport.airports[code];
+    document.getElementById('airport-content').innerHTML =
+        `<div class="card" style="margin-bottom:16px"><div style="font-weight:800;font-size:16px;margin-bottom:6px">${a.name}</div><p style="color:#64748b;font-size:14px">${a.desc}</p></div>`
+        + a.options.map(o=>`<div class="card" style="margin-bottom:12px;display:flex;gap:16px">
+            <div style="font-size:36px;line-height:1">${o.icon}</div>
+            <div><div style="font-weight:800;font-size:15px;margin-bottom:4px">${o.title}</div>
+            <div style="color:#64748b;font-size:14px;line-height:1.6">${o.desc}</div></div>
+            </div>`).join('');
+}
 
-        function calcMrt() {
-            const f = document.getElementById('mrt-from').value;
-            const t = document.getElementById('mrt-to').value;
-            if (!f || !t) { alert('請選擇起點和終點'); return; }
-            if (f === t) { alert('起點和終點相同！'); return; }
-            const mins = Math.floor(Math.random() * 25) + 8;
-            const fLine = f.split('::')[1], tLine = t.split('::')[1];
-            const transfer = fLine !== tLine ? '（含1次轉乘）' : '';
-            document.getElementById('mrt-result').style.display = 'block';
-            document.getElementById('mrt-time').textContent = mins;
-            document.getElementById('mrt-detail').textContent = `分鐘 ${transfer} · 車資約 NT$${Math.floor(mins / 2) * 5 + 10}`;
-        }
+function renderItin(key){
+    const it = ITINS[key];
+    document.getElementById('itin-content').innerHTML =
+        `<div style="font-size:20px;font-weight:800;margin-bottom:4px">${it.title}</div>`
+        + `<div style="color:#64748b;font-size:14px;margin-bottom:24px">${it.desc}</div>`
+        + it.days.map(d=>`
+            <div class="day-line" style="border-color:${d.color}">
+                <div style="color:${d.color};font-size:11px;font-weight:800;letter-spacing:.1em">${d.label} · ${d.title}</div>
+                <ul style="margin-top:8px;display:grid;gap:6px;padding:0;list-style:none">
+                ${d.items.map(i=>`<li style="font-size:13px;font-weight:600;color:#334155;background:#f8fafc;padding:8px 12px;border-radius:10px">${i}</li>`).join('')}
+                </ul>
+            </div>`).join('');
+}
 
-        function renderAirport(code) {
-            const a = AIRPORTS[code];
-            const div = document.getElementById('airport-content');
-            div.innerHTML = `<div class="card" style="margin-bottom:20px"><div style="font-size:18px;font-weight:800;margin-bottom:6px">${a.name}</div><p style="color:#64748b;font-size:14px">${a.desc}</p></div>` +
-                a.options.map(o => `<div class="card" style="margin-bottom:12px;display:flex;gap:16px;align-items:flex-start"><div style="font-size:36px;line-height:1">${o.icon}</div><div><div style="font-weight:800;font-size:15px;margin-bottom:4px">${o.title}</div><div style="color:#64748b;font-size:14px;line-height:1.6">${o.desc}</div></div></div>`).join('');
-        }
-        function switchAirport(code, btn) {
-            document.querySelectorAll('#airport-tabs button').forEach(b => { b.style.background = '#f8fafc'; b.style.color = '#64748b'; b.classList.remove('active') });
-            btn.style.background = '#eff6ff'; btn.style.color = '#3b82f6'; btn.classList.add('active');
-            renderAirport(code);
-        }
+function renderChecklist(){
+    const saved = JSON.parse(localStorage.getItem('tw_checklist')||'{}');
+    document.getElementById('checklist-container').innerHTML = CHECKLIST_ITEMS.map((item,i)=>`
+        <div class="check-row ${saved[i]?'done':''}" onclick="toggleCheck(${i})">
+            <div class="check-circle">${saved[i]?'✓':''}</div>
+            <span class="check-label" style="font-weight:600;font-size:14px">${item}</span>
+        </div>`).join('');
+}
 
-        function renderItin(key) {
-            const it = ITINS[key];
-            document.getElementById('itin-content').innerHTML =
-                `<div style="font-size:20px;font-weight:800;margin-bottom:4px">${it.title}</div><div style="color:#64748b;font-size:14px;margin-bottom:24px">${it.desc}</div>` +
-                it.days.map(d => `<div class="day-line" style="border-color:${d.color}"><div style="color:${d.color};font-size:11px;font-weight:800;letter-spacing:.1em">${d.label} · ${d.title}</div><ul style="margin-top:8px;display:grid;gap:6px;padding:0;list-style:none">${d.items.map(i => `<li style="font-size:13px;font-weight:600;color:#334155;background:#f8fafc;padding:8px 12px;border-radius:10px">${i}</li>`).join('')}</ul></div>`).join('');
-        }
-        function switchItin(key, btn) {
-            document.querySelectorAll('#itin-tabs button').forEach(b => { b.style.background = '#f8fafc'; b.style.color = '#64748b'; b.classList.remove('active') });
-            btn.style.background = '#fef3c7'; btn.style.color = '#d97706'; btn.classList.add('active');
-            renderItin(key);
-        }
+function showAttractionDetail(key){
+    const a = ATTRACTIONS[key];
+    if(!a) return;
+    document.getElementById('modal-body').innerHTML = `
+        <button onclick="closeModal2()" style="float:right;background:#f1f5f9;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px">✕</button>
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">${a.subtitle}</div>
+        <h3 style="font-size:26px;font-weight:800;margin:6px 0 12px">${a.name}</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+            ${a.tags.map(t=>`<span class="badge" style="background:#f1f5f9;color:#475569">${t}</span>`).join('')}
+        </div>
+        <p style="color:#64748b;line-height:1.7;font-size:14px;margin-bottom:20px">${a.desc}</p>
+        <div style="background:#f8fafc;border-radius:16px;padding:16px;display:grid;gap:8px">
+            ${a.info.map(i=>`<div style="font-size:13px;font-weight:600;color:#334155">${i}</div>`).join('')}
+        </div>
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.name+' Taiwan')}" target="_blank"
+            style="display:block;margin-top:20px;background:#059669;color:#fff;text-align:center;padding:16px;border-radius:16px;font-weight:800;text-decoration:none">
+            📍 開啟 Google Maps 導航
+        </a>`;
+    document.getElementById('modal-backdrop').classList.add('open');
+}
 
-        function renderChecklist() {
-            const saved = JSON.parse(localStorage.getItem('tw_checklist') || '{}');
-            document.getElementById('checklist-container').innerHTML = CHECKLIST_ITEMS.map((item, i) => `
-    <div class="check-row ${saved[i] ? 'done' : ''}" id="ci-${i}" onclick="toggleCheck(${i})">
-      <div class="check-circle">${saved[i] ? '✓' : ''}</div>
-      <span class="check-label" style="font-weight:600;font-size:14px">${item}</span>
-    </div>`).join('');
-        }
-        function toggleCheck(i) {
-            const saved = JSON.parse(localStorage.getItem('tw_checklist') || '{}');
-            saved[i] = !saved[i];
-            localStorage.setItem('tw_checklist', JSON.stringify(saved));
-            renderChecklist();
-        }
-        function resetChecklist() {
-            localStorage.removeItem('tw_checklist');
-            renderChecklist();
-        }
+// ═══════════════════════════════
+// FILTER HANDLERS
+// ═══════════════════════════════
+function filterSights(f,btn){
+    document.querySelectorAll('#sights-region-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#ecfdf5';btn.style.color='#059669';btn.classList.add('active');
+    renderSights(f);
+}
+function filterFood(f,btn){
+    document.querySelectorAll('#food-cat-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#fef2f2';btn.style.color='#ef4444';btn.classList.add('active');
+    renderFood(f);
+}
+function filterHotel(f,btn){
+    document.querySelectorAll('#hotel-city-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#f5f3ff';btn.style.color='#7c3aed';btn.classList.add('active');
+    renderHotel(f);
+}
+function filterShop(f,btn){
+    document.querySelectorAll('#shop-cat-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#fdf2f8';btn.style.color='#db2777';btn.classList.add('active');
+    renderShop(f);
+}
+function switchTransport(mode,btn){
+    document.querySelectorAll('#transport-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#eff6ff';btn.style.color='#2563eb';btn.classList.add('active');
+    renderTransport(mode);
+}
+function switchAirport(code,btn){
+    document.querySelectorAll('#apt-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#eff6ff';btn.style.color='#2563eb';btn.classList.add('active');
+    renderAirport(code);
+}
+function switchItin(key,btn){
+    document.querySelectorAll('#itin-tabs button').forEach(b=>{b.style.background='#f8fafc';b.style.color='#64748b';b.classList.remove('active');});
+    btn.style.background='#fef3c7';btn.style.color='#d97706';btn.classList.add('active');
+    renderItin(key);
+}
 
-        function showAttractionDetail(key) {
-            const a = ATTRACTIONS[key];
-            document.getElementById('modal-body').innerHTML = `
-    <button onclick="closeModal2()" style="float:right;background:#f1f5f9;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px">✕</button>
-    <div style="font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em">${a.subtitle}</div>
-    <h3 style="font-size:28px;font-weight:800;margin:6px 0 12px">${a.name}</h3>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-      ${a.tags.map(t => `<span class="badge" style="background:#f1f5f9;color:#64748b">${t}</span>`).join('')}
-    </div>
-    <p style="color:#64748b;line-height:1.7;font-size:14px;margin-bottom:20px">${a.desc}</p>
-    <div style="background:#f8fafc;border-radius:16px;padding:16px;display:grid;gap:8px">
-      ${a.info.map(i => `<div style="font-size:13px;font-weight:600;color:#334155">${i}</div>`).join('')}
-    </div>
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.name)}" target="_blank" 
-      style="display:block;margin-top:20px;background:#059669;color:#fff;text-align:center;padding:16px;border-radius:16px;font-weight:800;text-decoration:none">
-      📍 開啟 Google Maps 導航
-    </a>`;
-            document.getElementById('modal-backdrop').classList.add('open');
-        }
-        function closeModal(e) { if (e && e.target.id !== 'modal-backdrop') return; closeModal2(); }
-        function closeModal2() { document.getElementById('modal-backdrop').classList.remove('open'); }
-    </script>
+// ═══════════════════════════════
+// CORE NAV
+// ═══════════════════════════════
+function showPanel(id, clickedEl){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+id).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+    if(clickedEl) clickedEl.classList.add('active');
+    document.getElementById('sidebar').classList.remove('open');
+    window.scrollTo(0,0);
+    // lazy init
+    if(id==='sights' && !document.getElementById('sights-grid').children.length) renderSights();
+    if(id==='food' && !document.getElementById('food-grid').children.length) renderFood();
+    if(id==='hotel' && !document.getElementById('hotel-grid').children.length) renderHotel();
+    if(id==='shopping' && !document.getElementById('shop-grid').children.length) renderShop();
+    if(id==='transport' && !document.getElementById('transport-body').children.length) renderTransport('mrt');
+    if(id==='itin' && !document.getElementById('itin-content').children.length) renderItin('classic');
+    if(id==='tips' && !document.getElementById('tips-container').children.length) renderTips();
+    if(id==='checklist') renderChecklist();
+}
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+}
+function setBottomNav(activeId){
+    document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+    document.getElementById(activeId).classList.add('active');
+}
+
+// Close sidebar on outside click
+document.addEventListener('click',e=>{
+    if(!e.target.closest('#sidebar') && !e.target.closest('.mobile-header') && !e.target.closest('.bottom-nav')){
+        document.getElementById('sidebar').classList.remove('open');
+    }
+});
+
+function calcMrt(){
+    const f=document.getElementById('mrt-from').value;
+    const t=document.getElementById('mrt-to').value;
+    if(!f||!t){alert('請選擇起點和終點');return;}
+    if(f===t){alert('起點和終點相同！');return;}
+    const mins = Math.floor(Math.random()*25)+8;
+    const fLine=f.split('::')[1], tLine=t.split('::')[1];
+    const transfer = fLine!==tLine ? '（含1次轉乘）':'';
+    const fare = Math.floor(mins/2)*5+10;
+    document.getElementById('mrt-result').style.display='block';
+    document.getElementById('mrt-result').innerHTML=`
+        <div class="result-box">
+            <div style="font-size:12px;font-weight:700;color:#065f46;letter-spacing:.1em">預估乘車時間</div>
+            <div style="font-size:48px;font-weight:800;color:#059669;margin:8px 0">${mins}</div>
+            <div style="font-size:14px;color:#047857;font-weight:700">分鐘 ${transfer} · 車資約 NT$${fare}</div>
+            <div style="font-size:12px;color:#6ee7b7;margin-top:6px">持悠遊卡享 85 折優惠</div>
+        </div>`;
+}
+
+function renderTips(){
+    document.getElementById('tips-container').innerHTML = TIPS.map(t=>`
+        <div class="card">
+            <div style="display:flex;align-items:flex-start;gap:16px">
+                <div style="font-size:36px;line-height:1">${t.icon}</div>
+                <div>
+                    <div style="font-weight:800;font-size:15px;margin-bottom:6px">${t.title}</div>
+                    <div style="color:#64748b;font-size:14px;line-height:1.6">${t.content}</div>
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+function toggleCheck(i){
+    const saved=JSON.parse(localStorage.getItem('tw_checklist')||'{}');
+    saved[i]=!saved[i];
+    localStorage.setItem('tw_checklist',JSON.stringify(saved));
+    renderChecklist();
+}
+function resetChecklist(){
+    localStorage.removeItem('tw_checklist');
+    renderChecklist();
+}
+function closeModal(e){if(e&&e.target.id!=='modal-backdrop')return;closeModal2();}
+function closeModal2(){document.getElementById('modal-backdrop').classList.remove('open');}
+
+// ═══════════════════════════════
+// WEATHER (Open-Meteo, free API)
+// ═══════════════════════════════
+async function loadWeather(){
+    try{
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.04&longitude=121.53&current=temperature_2m,weathercode&timezone=Asia/Taipei');
+        const data = await res.json();
+        const temp = Math.round(data.current.temperature_2m);
+        const code = data.current.weathercode;
+        const icon = code<=1?'☀️':code<=3?'⛅':code<=48?'🌫️':code<=67?'🌧️':code<=77?'❄️':'⛈️';
+        const desc = code<=1?'晴朗':code<=3?'多雲':code<=48?'有霧':code<=67?'有雨':code<=77?'有雪':'雷雨';
+        document.getElementById('s-weather-text').textContent=`${temp}°C ${icon} ${desc}`;
+        document.getElementById('s-weather-sub').textContent='台北即時天氣';
+        document.getElementById('m-weather').textContent=`${icon} ${temp}°C`;
+    }catch(e){
+        document.getElementById('s-weather-text').textContent='27°C ☀️ 晴朗';
+        document.getElementById('s-weather-sub').textContent='（示範數據）';
+        document.getElementById('m-weather').textContent='☀️ 27°C';
+    }
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+    new Swiper('.main-swiper',{
+        effect:'coverflow', centeredSlides:true, slidesPerView:'auto',
+        coverflowEffect:{rotate:5,stretch:0,depth:80,modifier:1,slideShadows:false},
+        pagination:{el:'.swiper-pagination',clickable:true},
+        loop: true,
+    });
+    // Clock
+    const tick=()=>{
+        const t=new Date().toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit'});
+        document.querySelectorAll('[id$="-clock"]').forEach(el=>el.textContent=t);
+    };
+    tick(); setInterval(tick,1000);
+    // Weather
+    loadWeather();
+});
+</script>
 </body>
-
 </html>
