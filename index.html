@@ -97,6 +97,7 @@
             width: 280px; height: 380px; border-radius: 28px;
             overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,.12);
             position: relative; cursor: pointer; flex-shrink: 0;
+            pointer-events: auto !important;
         }
 
         /* ─── Cards ─── */
@@ -260,7 +261,7 @@
     <div style="padding:0 24px;margin-top:-32px">
         <div class="swiper main-swiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide" onclick="showAttractionDetail('taipei101')">
+                <div class="swiper-slide" data-id="taipei101">
                     <img src="taipei101.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
@@ -269,7 +270,7 @@
                         <div style="font-size:12px;opacity:.8">508m · 信義商圈</div>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="showAttractionDetail('taroko')">
+                <div class="swiper-slide" data-id="taroko">
                     <img src="taroko.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
@@ -278,7 +279,7 @@
                         <div style="font-size:12px;opacity:.8">Taroko Gorge · 花蓮</div>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="showAttractionDetail('jiufen')">
+                <div class="swiper-slide" data-id="jiufen">
                     <img src="jiufen.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
@@ -287,7 +288,7 @@
                         <div style="font-size:12px;opacity:.8">Jiufen · 新北市</div>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="showAttractionDetail('sunmoon')">
+                <div class="swiper-slide" data-id="sunmoon">
                     <img src="sunmoon.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
@@ -296,7 +297,7 @@
                         <div style="font-size:12px;opacity:.8">Sun Moon Lake · 南投</div>
                     </div>
                 </div>
-                <div class="swiper-slide" onclick="showAttractionDetail('kenting')">
+                <div class="swiper-slide" data-id="kenting">
                     <img src="kenting.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
@@ -1384,16 +1385,39 @@ async function loadWeather(){
 // INIT
 // ═══════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-    new Swiper('.main-swiper',{
+    const mainSwiper = new Swiper('.main-swiper',{
         slidesPerView:'auto',
         centeredSlides:true,
         spaceBetween:20,
         grabCursor:true,
         pagination:{el:'.swiper-pagination',clickable:true},
-        loop:true,
-        autoplay:{ delay:3500, disableOnInteraction:false, pauseOnMouseEnter:true },
+        rewind:true,
+        autoplay:{ delay:3500, disableOnInteraction:true, pauseOnMouseEnter:true },
         effect:'coverflow',
-        coverflowEffect:{ rotate:8, stretch:0, depth:120, modifier:1, slideShadows:false },
+        coverflowEffect:{ rotate:8, stretch:80, depth:100, modifier:1, slideShadows:false },
+    });
+    // Click: side card → slide to center; center card → open detail
+    let autoplayTimer = null;
+    function restartAutoplayLater(){
+        clearTimeout(autoplayTimer);
+        autoplayTimer = setTimeout(function(){ mainSwiper.autoplay.start(); }, 8000);
+    }
+    document.querySelector('.main-swiper .swiper-wrapper').addEventListener('click', function(e){
+        const slide = e.target.closest('.swiper-slide');
+        if(!slide) return;
+        mainSwiper.autoplay.stop();
+        // Use Swiper's own slides list for correct index
+        const clickedIdx = Array.prototype.indexOf.call(mainSwiper.slides, slide);
+        if(clickedIdx < 0) return;
+        if(clickedIdx === mainSwiper.activeIndex){
+            // Center card → open detail using data-id from THIS slide
+            const id = slide.getAttribute('data-id');
+            if(id) showAttractionDetail(id);
+        } else {
+            // Side card → slide to center
+            mainSwiper.slideTo(clickedIdx, 400);
+        }
+        restartAutoplayLater();
     });
     // Clock
     const tick=()=>{
