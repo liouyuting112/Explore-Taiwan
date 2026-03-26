@@ -23,7 +23,7 @@
         @media(max-width:900px) {
             .sidebar { transform: translateX(-100%); transition: .3s; }
             .sidebar.open { transform: translateX(0); }
-            .main-area { margin-left: 0; padding-bottom: 72px; }
+            .main-area { margin-left: 0; padding-bottom: 120px; }
             .mobile-header { display: flex !important; }
             .bottom-nav { display: flex !important; }
         }
@@ -38,6 +38,36 @@
             padding: 8px 0 max(8px, env(safe-area-inset-bottom));
             justify-content: space-around; align-items: center;
             box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+        }
+        /* ─── More Menu (mobile) ─── */
+        .more-menu-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 55;
+            background: rgba(0,0,0,.4); backdrop-filter: blur(4px);
+        }
+        .more-menu-backdrop.open { display: block; }
+        .more-menu {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+            background: #fff; border-radius: 28px 28px 0 0;
+            padding: 20px 24px max(24px, env(safe-area-inset-bottom));
+            transform: translateY(100%); transition: .35s cubic-bezier(.25,.8,.25,1);
+            box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+        }
+        .more-menu-backdrop.open .more-menu { transform: translateY(0); }
+        .more-menu-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            margin-top: 16px;
+        }
+        .more-menu-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            padding: 14px 8px; border-radius: 18px; cursor: pointer;
+            background: #f8fafc; border: none; transition: .2s;
+            font-size: 11px; font-weight: 700; color: #475569;
+        }
+        .more-menu-item:hover { background: #f1f5f9; transform: translateY(-2px); }
+        .more-menu-item .mm-icon {
+            width: 44px; height: 44px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: #fff;
         }
         .bnav-item {
             display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -179,7 +209,6 @@
 
 <!-- ═══ MOBILE TOP BAR ═══ -->
 <div class="mobile-header">
-    <button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer">☰</button>
     <div>
         <div style="font-size:10px;opacity:.7;font-weight:700">TAIPEI · <span id="m-clock">00:00</span></div>
         <div style="font-size:20px;font-weight:800">探索台灣</div>
@@ -259,8 +288,7 @@
                     </div>
                 </div>
                 <div class="swiper-slide" onclick="showAttractionDetail('sunmoon')">
-                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#0f766e,#0284c7)"></div>
-                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px">🌊</div>
+                    <img src="sunmoon.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
                         <span class="badge" style="background:#0284c7">湖泊</span>
@@ -269,8 +297,7 @@
                     </div>
                 </div>
                 <div class="swiper-slide" onclick="showAttractionDetail('kenting')">
-                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#0891b2,#06b6d4)"></div>
-                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px">🏖️</div>
+                    <img src="kenting.png" style="width:100%;height:100%;object-fit:cover">
                     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)"></div>
                     <div style="position:absolute;bottom:28px;left:24px;right:24px;color:#fff">
                         <span class="badge" style="background:#06b6d4">海灘</span>
@@ -286,17 +313,17 @@
     <div style="padding:0 24px 40px">
         <div style="font-size:17px;font-weight:800;margin-bottom:14px">快速入口</div>
         <div class="feature-grid">
-            <div class="feat-card" onclick="showPanel('sights',document.querySelectorAll('.nav-link')[1])">
+            <div class="feat-card" onclick="showPanel('sights',document.querySelectorAll('.nav-link')[1]);setBottomNav('bnav-sights')">
                 <div class="feat-icon" style="background:#059669">🗺️</div>
                 <div style="font-weight:800;font-size:13px">熱門景點</div>
                 <div style="font-size:11px;color:#94a3b8;margin-top:4px">30+ 個精選</div>
             </div>
-            <div class="feat-card" onclick="showPanel('food',document.querySelectorAll('.nav-link')[2])">
+            <div class="feat-card" onclick="showPanel('food',document.querySelectorAll('.nav-link')[2]);setBottomNav('bnav-food')">
                 <div class="feat-icon" style="background:#ef4444">🍜</div>
                 <div style="font-weight:800;font-size:13px">美食探索</div>
                 <div style="font-size:11px;color:#94a3b8;margin-top:4px">夜市必吃</div>
             </div>
-            <div class="feat-card" onclick="showPanel('transport',document.querySelectorAll('.nav-link')[4])">
+            <div class="feat-card" onclick="showPanel('transport',document.querySelectorAll('.nav-link')[4]);setBottomNav('bnav-transport')">
                 <div class="feat-icon" style="background:#0284c7">🚇</div>
                 <div style="font-weight:800;font-size:13px">交通指南</div>
                 <div style="font-size:11px;color:#94a3b8;margin-top:4px">MRT+高鐵</div>
@@ -500,10 +527,37 @@
     <button class="bnav-item" id="bnav-transport" onclick="showPanel('transport',document.querySelectorAll('.nav-link')[4]);setBottomNav('bnav-transport')">
         <span class="bnav-icon">🚇</span>交通
     </button>
-    <button class="bnav-item" id="bnav-more" onclick="toggleSidebar()">
+    <button class="bnav-item" id="bnav-more" onclick="toggleMoreMenu()">
         <span class="bnav-icon">☰</span>更多
     </button>
 </nav>
+
+<!-- ═══ MORE MENU (MOBILE) ═══ -->
+<div class="more-menu-backdrop" id="more-menu-backdrop" onclick="closeMoreMenu()">
+    <div class="more-menu" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:800;font-size:16px">更多功能</div>
+            <button onclick="closeMoreMenu()" style="background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+        </div>
+        <div class="more-menu-grid">
+            <button class="more-menu-item" onclick="closeMoreMenu();showPanel('hotel',document.querySelectorAll('.nav-link')[3])">
+                <div class="mm-icon" style="background:#7c3aed">🏨</div>住宿推薦
+            </button>
+            <button class="more-menu-item" onclick="closeMoreMenu();showPanel('shopping',document.querySelectorAll('.nav-link')[5])">
+                <div class="mm-icon" style="background:#db2777">🛍️</div>購物攻略
+            </button>
+            <button class="more-menu-item" onclick="closeMoreMenu();showPanel('itin',document.querySelectorAll('.nav-link')[6])">
+                <div class="mm-icon" style="background:#f59e0b">📅</div>推薦行程
+            </button>
+            <button class="more-menu-item" onclick="closeMoreMenu();showPanel('tips',document.querySelectorAll('.nav-link')[7])">
+                <div class="mm-icon" style="background:#8b5cf6">💡</div>旅遊知識
+            </button>
+            <button class="more-menu-item" onclick="closeMoreMenu();showPanel('checklist',document.querySelectorAll('.nav-link')[8])">
+                <div class="mm-icon" style="background:#1e293b">✅</div>出發清單
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- ═══ ATTRACTION MODAL ═══ -->
 <div id="modal-backdrop" onclick="closeModal(event)">
@@ -1145,115 +1199,34 @@ function showAttractionDetail(key){
 function renderMrtMap(){
     return `
     <div style="max-width:760px">
-        <div class="card" style="margin-bottom:20px;padding:16px 20px">
-            <div style="font-size:13px;font-weight:700;color:#334155;margin-bottom:8px">🗺️ 台北捷運路線圖（主要路線 & 旅遊站）</div>
-            <div style="font-size:12px;color:#64748b">以下為主要路線示意圖，標記熱門旅遊景點站。實際路線以 Google Maps 或捷運官方 App 為準。</div>
+        <div class="card" style="margin-bottom:20px;padding:20px">
+            <div style="font-size:16px;font-weight:800;color:#334155;margin-bottom:8px">🗺️ 台北捷運官方路線圖</div>
+            <div style="font-size:13px;color:#64748b;margin-bottom:16px">點擊下方按鈕前往台北捷運官方網站查看最新、最完整的路線圖。</div>
+            <div style="background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-radius:20px;padding:32px 24px;text-align:center;margin-bottom:16px">
+                <div style="font-size:64px;margin-bottom:12px">🚇</div>
+                <div style="font-size:18px;font-weight:800;color:#1e293b;margin-bottom:4px">Taipei Metro Route Map</div>
+                <div style="font-size:13px;color:#64748b">台北捷運公司 TRTC 官方路線圖</div>
+            </div>
+            <a href="https://www.metro.taipei/cp.aspx?n=73B51F32ED23C5E1" target="_blank" rel="noopener"
+                style="display:block;background:linear-gradient(135deg,#059669,#0284c7);color:#fff;text-align:center;padding:16px;border-radius:16px;font-weight:800;text-decoration:none;font-size:15px;transition:.2s">
+                🗺️ 前往官方網站查看路線圖
+            </a>
+            <a href="https://www.metro.taipei/" target="_blank" rel="noopener"
+                style="display:block;margin-top:10px;background:#f1f5f9;color:#334155;text-align:center;padding:12px;border-radius:14px;font-weight:700;text-decoration:none;font-size:13px">
+                🌐 台北捷運官網首頁
+            </a>
         </div>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-        <svg viewBox="0 0 760 560" width="100%" style="min-width:480px;font-family:'Outfit','Noto Sans TC',sans-serif;background:#f8fafc;border-radius:20px;padding:10px" xmlns="http://www.w3.org/2000/svg">
-          <!-- ── 板南線 Blue ── -->
-          <line x1="60" y1="280" x2="700" y2="280" stroke="#2563eb" stroke-width="8" stroke-linecap="round"/>
-          <!-- 板南線站點 -->
-          <circle cx="120" cy="280" r="9" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="120" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">西門</text>
-          <circle cx="200" cy="280" r="12" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="200" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">台北車站</text>
-          <circle cx="300" cy="280" r="9" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="300" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">忠孝復興</text>
-          <circle cx="400" cy="280" r="9" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="400" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">忠孝敦化</text>
-          <circle cx="490" cy="280" r="12" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="490" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">市政府</text>
-          <text x="490" y="313" text-anchor="middle" font-size="9" fill="#64748b">信義商圈</text>
-          <circle cx="560" cy="280" r="12" fill="#fff" stroke="#2563eb" stroke-width="4"/>
-          <text x="560" y="300" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">台北101</text>
-          <text x="560" y="313" text-anchor="middle" font-size="9" fill="#64748b">/世貿</text>
-          <!-- ── 淡水信義線 Red ── -->
-          <line x1="200" y1="60" x2="200" y2="480" stroke="#dc2626" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="200" cy="100" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="103" font-size="10" fill="#1e293b" font-weight="700">淡水</text>
-          <text x="220" y="114" font-size="9" fill="#64748b">漁人碼頭</text>
-          <circle cx="200" cy="150" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="153" font-size="10" fill="#1e293b" font-weight="700">劍潭</text>
-          <text x="220" y="164" font-size="9" fill="#64748b">士林夜市</text>
-          <circle cx="200" cy="200" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="203" font-size="10" fill="#1e293b" font-weight="700">士林</text>
-          <circle cx="200" cy="240" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="243" font-size="10" fill="#1e293b" font-weight="700">中山</text>
-          <!-- 台北車站交叉 -->
-          <circle cx="200" cy="280" r="14" fill="#fff" stroke="#9333ea" stroke-width="4"/>
-          <text x="155" y="267" font-size="10" fill="#9333ea" font-weight="800">轉乘</text>
-          <circle cx="200" cy="330" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="333" font-size="10" fill="#1e293b" font-weight="700">中正紀念堂</text>
-          <circle cx="200" cy="380" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="383" font-size="10" fill="#1e293b" font-weight="700">台大醫院</text>
-          <circle cx="200" cy="430" r="9" fill="#fff" stroke="#dc2626" stroke-width="4"/>
-          <text x="220" y="433" font-size="10" fill="#1e293b" font-weight="700">象山</text>
-          <text x="220" y="444" font-size="9" fill="#64748b">步道/台北101景</text>
-          <!-- ── 松山新店線 Green ── -->
-          <line x1="120" y1="160" x2="120" y2="480" stroke="#16a34a" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="120" cy="180" r="9" fill="#fff" stroke="#16a34a" stroke-width="4"/>
-          <text x="95" y="183" text-anchor="end" font-size="10" fill="#1e293b" font-weight="700">松山</text>
-          <text x="95" y="194" text-anchor="end" font-size="9" fill="#64748b">饒河夜市</text>
-          <circle cx="120" cy="240" r="9" fill="#fff" stroke="#16a34a" stroke-width="4"/>
-          <text x="95" y="243" text-anchor="end" font-size="10" fill="#1e293b" font-weight="700">北門</text>
-          <text x="95" y="254" text-anchor="end" font-size="9" fill="#64748b">迪化街</text>
-          <!-- 西門交叉 -->
-          <circle cx="120" cy="280" r="12" fill="#fff" stroke="#9333ea" stroke-width="4"/>
-          <circle cx="120" cy="340" r="9" fill="#fff" stroke="#16a34a" stroke-width="4"/>
-          <text x="95" y="343" text-anchor="end" font-size="10" fill="#1e293b" font-weight="700">古亭</text>
-          <circle cx="120" cy="440" r="9" fill="#fff" stroke="#16a34a" stroke-width="4"/>
-          <text x="95" y="443" text-anchor="end" font-size="10" fill="#1e293b" font-weight="700">新店</text>
-          <text x="95" y="454" text-anchor="end" font-size="9" fill="#64748b">碧潭</text>
-          <!-- ── 中和新蘆線 Orange ── -->
-          <line x1="60" y1="340" x2="490" y2="340" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="80" cy="340" r="9" fill="#fff" stroke="#ea580c" stroke-width="4"/>
-          <text x="80" y="360" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">大橋頭</text>
-          <!-- 古亭交叉 -->
-          <circle cx="120" cy="340" r="12" fill="#fff" stroke="#9333ea" stroke-width="4"/>
-          <circle cx="300" cy="340" r="9" fill="#fff" stroke="#ea580c" stroke-width="4"/>
-          <text x="300" y="360" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">忠孝新生</text>
-          <text x="300" y="372" text-anchor="middle" font-size="9" fill="#64748b">華山文創</text>
-          <!-- ── 文湖線 Brown ── -->
-          <path d="M300 180 Q380 100 490 100 Q580 100 620 180 Q650 240 620 280" stroke="#92400e" stroke-width="6" stroke-linecap="round" fill="none"/>
-          <circle cx="300" cy="180" r="9" fill="#fff" stroke="#92400e" stroke-width="3"/>
-          <text x="310" y="170" font-size="10" fill="#1e293b" font-weight="700">中山國中</text>
-          <circle cx="490" cy="95" r="9" fill="#fff" stroke="#92400e" stroke-width="3"/>
-          <text x="490" y="82" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="700">松山機場</text>
-          <!-- 忠孝復興交叉 -->
-          <circle cx="300" cy="280" r="12" fill="#fff" stroke="#9333ea" stroke-width="4"/>
-          <!-- 市政府附近 -->
-          <circle cx="620" cy="280" r="9" fill="#fff" stroke="#92400e" stroke-width="3"/>
-          <text x="640" y="280" font-size="10" fill="#1e293b" font-weight="700">國父紀念館</text>
-          <text x="640" y="291" font-size="9" fill="#64748b">松山文創</text>
-          <!-- 路線圖說 -->
-          <rect x="420" y="380" width="310" height="155" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
-          <text x="435" y="400" font-size="12" fill="#1e293b" font-weight="800">路線圖說</text>
-          <line x1="435" y1="416" x2="465" y2="416" stroke="#2563eb" stroke-width="6"/>
-          <text x="472" y="420" font-size="11" fill="#334155">板南線（藍）</text>
-          <line x1="435" y1="434" x2="465" y2="434" stroke="#dc2626" stroke-width="6"/>
-          <text x="472" y="438" font-size="11" fill="#334155">淡水信義線（紅）</text>
-          <line x1="435" y1="452" x2="465" y2="452" stroke="#16a34a" stroke-width="6"/>
-          <text x="472" y="456" font-size="11" fill="#334155">松山新店線（綠）</text>
-          <line x1="435" y1="470" x2="465" y2="470" stroke="#ea580c" stroke-width="6"/>
-          <text x="472" y="474" font-size="11" fill="#334155">中和新蘆線（橘）</text>
-          <line x1="435" y1="488" x2="465" y2="488" stroke="#92400e" stroke-width="6"/>
-          <text x="472" y="492" font-size="11" fill="#334155">文湖線（棕）</text>
-          <circle cx="450" cy="510" r="7" fill="#fff" stroke="#9333ea" stroke-width="3"/>
-          <text x="462" y="514" font-size="11" fill="#334155">轉乘站</text>
-        </svg>
-        </div>
-        <div class="card" style="margin-top:16px;background:linear-gradient(135deg,#eff6ff,#f0fdf4)">
+        <div class="card" style="background:linear-gradient(135deg,#eff6ff,#f0fdf4)">
             <div style="font-weight:800;font-size:14px;margin-bottom:10px">🎯 熱門景點捷運站速查</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>台北101</strong><br><span style="color:#64748b">板南線 台北101/世貿</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>士林夜市</strong><br><span style="color:#64748b">紅線 劍潭站</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>中正紀念堂</strong><br><span style="color:#64748b">紅線 中正紀念堂</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>饒河夜市</strong><br><span style="color:#64748b">綠線 松山站</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>迪化街</strong><br><span style="color:#64748b">綠線 北門站</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>華山文創</strong><br><span style="color:#64748b">橘線 忠孝新生</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>松山文創/誠品</strong><br><span style="color:#64748b">棕線 國父紀念館</span></div>
-                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>淡水老街</strong><br><span style="color:#64748b">紅線 淡水站（終）</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>台北101</strong><br><span style="color:#64748b">🔵 板南線 台北101/世貿站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>士林夜市</strong><br><span style="color:#64748b">🔴 紅線 劍潭站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>中正紀念堂</strong><br><span style="color:#64748b">🔴 紅線 中正紀念堂站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>饒河夜市</strong><br><span style="color:#64748b">🟢 綠線 松山站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>迪化街</strong><br><span style="color:#64748b">🟢 綠線 北門站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>華山文創</strong><br><span style="color:#64748b">🟠 橘線 忠孝新生站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>松山文創/誠品</strong><br><span style="color:#64748b">🟤 棕線 國父紀念館站</span></div>
+                <div style="background:#fff;border-radius:10px;padding:8px 12px"><strong>淡水老街</strong><br><span style="color:#64748b">🔴 紅線 淡水站（終點）</span></div>
             </div>
         </div>
     </div>`;
@@ -1322,6 +1295,12 @@ function showPanel(id, clickedEl){
 }
 function toggleSidebar(){
     document.getElementById('sidebar').classList.toggle('open');
+}
+function toggleMoreMenu(){
+    document.getElementById('more-menu-backdrop').classList.toggle('open');
+}
+function closeMoreMenu(){
+    document.getElementById('more-menu-backdrop').classList.remove('open');
 }
 function setBottomNav(activeId){
     document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
@@ -1411,7 +1390,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         spaceBetween:20,
         grabCursor:true,
         pagination:{el:'.swiper-pagination',clickable:true},
-        loop:false,
+        loop:true,
+        autoplay:{ delay:3500, disableOnInteraction:false, pauseOnMouseEnter:true },
+        effect:'coverflow',
+        coverflowEffect:{ rotate:8, stretch:0, depth:120, modifier:1, slideShadows:false },
     });
     // Clock
     const tick=()=>{
