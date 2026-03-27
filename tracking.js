@@ -7,8 +7,8 @@
 (function () {
     // --- CONFIGURATION ---
     // The user MUST replace this with their deployed Google Apps Script URL
-    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
-
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzrCk4nZzN9ESJrAIAY0OAXdQJQ0q96gsiXLcM2uQKI6b-gQ36YpbDws-vx6fZjeNc/exec";
+    
     if (GAS_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
         console.warn("Tracking: Please set the GAS_URL in tracking.js to enable Google Sheets logging.");
     }
@@ -24,7 +24,7 @@
 
     // --- TRACKING FUNCTION ---
     async function trackEvent(eventType, targetName, details = "") {
-        if (!GAS_URL || GAS_URL === "https://script.google.com/macros/s/AKfycbzrCk4nZzN9ESJrAIAY0OAXdQJQ0q96gsiXLcM2uQKI6b-gQ36YpbDws-vx6fZjeNc/exec") return;
+        if (!GAS_URL || GAS_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
 
         const payload = {
             visitor_id: visitorId,
